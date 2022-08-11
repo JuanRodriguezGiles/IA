@@ -7,7 +7,6 @@ public class GoToDeposit : FSMAction
     private Transform deposit;
     private Transform miner;
     private const float speed = 10.0f;
-
     
     public override void Execute()
     {
