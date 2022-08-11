@@ -1,53 +1,55 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+#region ENUMS
+public enum States
+{
+    Mining,
+    GoToMine,
+    GoToDeposit,
+    Idle,
+
+
+    _Count
+}
+
+public enum Flags
+{
+    OnFullInventory,
+    OnReachMine,
+    OnReachDeposit,
+    OnEmptyMine,
+
+
+    _Count
+}
+#endregion
 
 public class Miner : MonoBehaviour
 {
-
-    enum States
-    {
-        Mining,
-        GoToMine,
-        GoToDeposit,
-        Idle,
-
-
-
-        _Count
-    }
-
-    enum Flags
-    {
-        OnFullInventory,
-        OnReachMine,
-        OnReachDeposit,
-        OnEmpyMine,
-
-
-
-        _Count
-    }
-
+    #region EXPOSED_FIELDS
     public GameObject mine;
     public GameObject deposit;
-
-    private float speed = 10.0f;
-    private float miningTime = 5.0f;
+    #endregion
+    
+    #region PRIVATE_FIELDS
+    private FSM fsm;
+    private const float speed = 10.0f;
+    private const float miningTime = 5.0f;
     private float currentMiningTime = 0.0f;
     private int mineUses = 10;
+    #endregion
 
-    private FSM fsm;
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        Mine asd = new Mine(fsm.SetFlag);
+        
         fsm = new FSM((int)States._Count, (int)Flags._Count);
-        fsm.ForceCurretState((int)States.GoToMine);
+        fsm.ForceCurrentState((int)States.GoToMine);
 
         fsm.SetRelation((int)States.GoToMine, (int)Flags.OnReachMine, (int)States.Mining);
         fsm.SetRelation((int)States.Mining, (int)Flags.OnFullInventory, (int)States.GoToDeposit);
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnReachDeposit, (int)States.GoToMine);
-        fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnEmpyMine, (int)States.Idle);
+        fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnEmptyMine, (int)States.Idle);
 
         fsm.AddBehaviour((int)States.Idle, () => { Debug.Log("Idle"); });
 
@@ -64,16 +66,15 @@ public class Miner : MonoBehaviour
                 mineUses--;
             }
         });
-        fsm.AddBehaviour((int)States.Mining, () =>{ Debug.Log("Mining"); });
+        fsm.AddBehaviour((int)States.Mining, () => { Debug.Log("Mining"); });
 
         fsm.AddBehaviour((int)States.GoToMine, () =>
         {
-
             Vector2 dir = (mine.transform.position - transform.position).normalized;
 
             if (Vector2.Distance(mine.transform.position, transform.position) > 1.0f)
             {
-                Vector2 movement = dir * 10.0f * Time.deltaTime;
+                Vector2 movement = dir * speed * Time.deltaTime;
                 transform.position += new Vector3(movement.x, movement.y);
             }
             else
@@ -89,23 +90,25 @@ public class Miner : MonoBehaviour
 
             if (Vector2.Distance(deposit.transform.position, transform.position) > 1.0f)
             {
-                Vector2 movement = dir * 10.0f * Time.deltaTime;
+                Vector2 movement = dir * speed * Time.deltaTime;
                 transform.position += new Vector3(movement.x, movement.y);
             }
             else
             {
                 if (mineUses <= 0)
-                    fsm.SetFlag((int)Flags.OnEmpyMine);
+                {
+                    fsm.SetFlag((int)Flags.OnEmptyMine);
+                }
                 else
+                {
                     fsm.SetFlag((int)Flags.OnReachDeposit);
+                }
             }
         });
         fsm.AddBehaviour((int)States.GoToDeposit, () => { Debug.Log("GoToDeposit"); });
-
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         fsm.Update();
     }

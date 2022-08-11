@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 public class FSM
 {
+    #region PRIVATE_FIELDS
     private int currentState;
     private int[,] relations;
     private Dictionary<int, List<Action>> behaviours;
+    #endregion
 
     public FSM(int states, int flags)
     {
@@ -13,13 +15,17 @@ public class FSM
 
         relations = new int[states, flags];
         for (int i = 0; i < states; i++)
+        {
             for (int j = 0; j < flags; j++)
+            {
                 relations[i, j] = -1;
+            }
+        }
 
         behaviours = new Dictionary<int, List<Action>>();
     }
 
-    public void ForceCurretState(int state)
+    public void ForceCurrentState(int state)
     {
         currentState = state;
     }
@@ -32,7 +38,9 @@ public class FSM
     public void SetFlag(int flag)
     {
         if (relations[currentState, flag] != -1)
+        {
             currentState = relations[currentState, flag];
+        }
     }
 
     public int GetCurrentState()
@@ -42,24 +50,27 @@ public class FSM
 
     public void SetBehaviour(int state, Action behaviour)
     {
-        List<Action> newBehaviours = new List<Action>();
-        newBehaviours.Add(behaviour);
+        List<Action> newBehaviours = new List<Action> { behaviour };
 
         if (behaviours.ContainsKey(state))
+        {
             behaviours[state] = newBehaviours;
+        }
         else
+        {
             behaviours.Add(state, newBehaviours);
+        }
     }
 
     public void AddBehaviour(int state, Action behaviour)
     {
-
         if (behaviours.ContainsKey(state))
+        {
             behaviours[state].Add(behaviour);
+        }
         else
         {
-            List<Action> newBehaviours = new List<Action>();
-            newBehaviours.Add(behaviour);
+            List<Action> newBehaviours = new List<Action> { behaviour };
             behaviours.Add(state, newBehaviours);
         }
     }
