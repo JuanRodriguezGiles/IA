@@ -1,29 +1,5 @@
 ﻿using UnityEngine;
 
-#region ENUMS
-public enum States
-{
-    Mining,
-    GoToMine,
-    GoToDeposit,
-    Idle,
-
-
-    _Count
-}
-
-public enum Flags
-{
-    OnFullInventory,
-    OnReachMine,
-    OnReachDeposit,
-    OnEmptyMine,
-
-
-    _Count
-}
-#endregion
-
 public class Miner : MonoBehaviour
 {
     #region EXPOSED_FIELDS
