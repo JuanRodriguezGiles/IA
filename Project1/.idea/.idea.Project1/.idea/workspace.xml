@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fa57693a-c650-4b0b-8db0-88c14a7205c3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Project1/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project1/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FSM.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FSM.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Miner.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Miner.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Actions/GoToMine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Actions/GoToMine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/FSM.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/FSM.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Miner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Miner.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +73,7 @@
       <option name="presentableId" value="Default" />
       <updated>1660171382120</updated>
       <workItem from="1660171395878" duration="2902000" />
-      <workItem from="1660250386608" duration="1012000" />
+      <workItem from="1660250386608" duration="1325000" />
     </task>
     <servers />
   </component>

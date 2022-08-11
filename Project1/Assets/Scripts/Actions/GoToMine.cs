@@ -23,8 +23,10 @@ public class GoToMine : FSMAction
         }
     }
 
-    public GoToMine(Action<int> onSetFlag)
+    public GoToMine(Action<int> onSetFlag, Transform mine, Transform miner)
     {
         this.onSetFlag = onSetFlag;
+        this.mine = mine;
+        this.miner = miner;
     }
 }
