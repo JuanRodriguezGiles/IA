@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class GoToMine : FSMAction
 {
-    private Transform mine;
-    private Transform miner;
+    #region PRIVATE_FIELDS
+    private readonly Vector3 mine;
+    private readonly Transform miner;
     private const float speed = 10.0f;
+    private readonly Func<float> onGetDeltaTime;
+    #endregion
 
+    #region OVERRIDE
     public override void Execute()
     {
-        Vector2 dir = (mine.position - miner.position).normalized;
+        Vector2 dir = (mine - miner.position).normalized;
 
-        if (Vector2.Distance(mine.position, miner.position) > 1.0f)
+        if (Vector2.Distance(mine, miner.position) > 1.0f)
         {
-            Vector2 movement = dir * speed * Time.deltaTime;
+            Vector2 movement = dir * (speed * onGetDeltaTime.Invoke());
             miner.position += new Vector3(movement.x, movement.y);
         }
         else
@@ -22,11 +26,15 @@ public class GoToMine : FSMAction
             onSetFlag?.Invoke((int)Flags.OnReachMine);
         }
     }
+    #endregion
 
-    public GoToMine(Action<int> onSetFlag, Transform mine, Transform miner)
+    #region CONSTRUCTOR
+    public GoToMine(Action<int> onSetFlag, Func<float> onGetDeltaTime, Vector3 mine, Transform miner)
     {
+        this.onGetDeltaTime = onGetDeltaTime;
         this.onSetFlag = onSetFlag;
         this.mine = mine;
         this.miner = miner;
     }
+    #endregion
 }

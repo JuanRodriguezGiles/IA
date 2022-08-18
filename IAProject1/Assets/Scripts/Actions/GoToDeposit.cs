@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class GoToDeposit : FSMAction
 {
-    private Transform deposit;
-    private Transform miner;
+    #region PRIVATE_FIELDS
+    private readonly Vector3 deposit;
+    private readonly Transform miner;
     private const float speed = 10.0f;
+    private readonly Func<float> onGetDeltaTime;
+    #endregion
     
+    #region OVERRIDE
     public override void Execute()
     {
-        Vector2 dir = (deposit.position - miner.position).normalized;
+        Vector2 dir = (deposit - miner.position).normalized;
 
-        if (Vector2.Distance(deposit.position, miner.position) > 1.0f)
+        if (Vector2.Distance(deposit, miner.position) > 1.0f)
         {
-            Vector2 movement = dir * speed * Time.deltaTime;
+            Vector2 movement = dir * (speed * onGetDeltaTime.Invoke());
             miner.position += new Vector3(movement.x, movement.y);
         }
         else
@@ -29,11 +33,16 @@ public class GoToDeposit : FSMAction
             }
         }
     }
+    #endregion
 
-    public GoToDeposit(Action<int> onSetFlag, Transform deposit, Transform miner)
+    #region CONSTRUCTOR
+    public GoToDeposit(Action<int> onSetFlag, Func<float> onGetDeltaTime, Vector3 deposit, Transform miner)
     {
+        this.onGetDeltaTime = onGetDeltaTime;
         this.onSetFlag = onSetFlag;
         this.deposit = deposit;
         this.miner = miner;
     }
+    #endregion
+ 
 }
