@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-using UnityEngine;
+public class State
+{
+    public List<FSMAction> behaviours;
+    public Action onAbruptExit;
+}
 
 public class FSM
 {
     #region PRIVATE_FIELDS
     private int currentState;
     private int[,] relations;
-    private Dictionary<int, List<FSMAction>> behaviours;
+    private Dictionary<int, State> behaviours;
     #endregion
 
     public FSM(int states, int flags)
@@ -23,7 +28,7 @@ public class FSM
             }
         }
 
-        behaviours = new Dictionary<int, List<FSMAction>>();
+        behaviours = new Dictionary<int, State>();
     }
 
     public void ForceCurrentState(int state)
@@ -49,30 +54,50 @@ public class FSM
         return currentState;
     }
 
-    public void SetBehaviour(int state, FSMAction behaviour)
+    public void SetBehaviour(int state, FSMAction behaviour, Action onAbruptExit = null)
     {
+        State newState = new State
+        {
+            behaviours = new List<FSMAction> { behaviour },
+            onAbruptExit = onAbruptExit
+        };
         List<FSMAction> newBehaviours = new List<FSMAction> { behaviour };
 
         if (behaviours.ContainsKey(state))
         {
-            behaviours[state] = newBehaviours;
+            behaviours[state] = newState;
         }
         else
         {
-            behaviours.Add(state, newBehaviours);
+            behaviours.Add(state, newState);
         }
     }
 
-    public void AddBehaviour(int state, FSMAction behaviour)
+    public void AddBehaviour(int state, FSMAction behaviour, Action onAbruptExit = null)
     {
         if (behaviours.ContainsKey(state))
         {
-            behaviours[state].Add(behaviour);
+            behaviours[state].behaviours.Add(behaviour);
         }
         else
         {
-            List<FSMAction> newBehaviours = new List<FSMAction> { behaviour };
-            behaviours.Add(state, newBehaviours);
+            State newState = new State
+            {
+                behaviours = new List<FSMAction> { behaviour },
+                onAbruptExit = onAbruptExit
+            };
+
+            behaviours.Add(state, newState);
+        }
+    }
+
+    public void Exit()
+    {
+        if (behaviours.ContainsKey(currentState))
+        {
+            Action onExit = behaviours[currentState].onAbruptExit;
+            
+            onExit?.Invoke();
         }
     }
 
@@ -80,7 +105,7 @@ public class FSM
     {
         if (behaviours.ContainsKey(currentState))
         {
-            List<FSMAction> actions = behaviours[currentState];
+            List<FSMAction> actions = behaviours[currentState].behaviours;
             if (actions != null)
             {
                 for (int i = 0; i < actions.Count; i++)

@@ -10,7 +10,7 @@ public class GoToDeposit : FSMAction
     private const float speed = 10.0f;
     private readonly Func<float> onGetDeltaTime;
     #endregion
-    
+
     #region OVERRIDE
     public override void Execute()
     {
@@ -44,5 +44,4 @@ public class GoToDeposit : FSMAction
         this.miner = miner;
     }
     #endregion
- 
 }
