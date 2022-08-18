@@ -17,10 +17,10 @@ public class Miners : MonoBehaviour
     private void Start()
     {
         parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 12 };
-
+        
         for (int i = 0; i < 100; i++)
         {
-            GameObject go = Instantiate(minerGo);
+            GameObject go = Instantiate(minerGo, transform);
             Miner miner = go.GetComponent<Miner>();
             miner.Init(mine, deposit, GetDeltaTime);
 
