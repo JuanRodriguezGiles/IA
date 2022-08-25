@@ -6,10 +6,11 @@ using UnityEngine;
 public class Miners : MonoBehaviour
 {
     #region EXPOSED_FIELDS
-    public GameObject minerGo;
-    public GameObject mine;
-    public GameObject deposit;
-    public GameObject rest;
+    [SerializeField] private int minersCount = 1;
+    [SerializeField] private GameObject minerGo;
+    [SerializeField] private GameObject mine;
+    [SerializeField] private GameObject deposit;
+    [SerializeField] private GameObject rest;
     #endregion
 
     #region PRIVATE_FIELDS
@@ -23,7 +24,7 @@ public class Miners : MonoBehaviour
     {
         parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 12 };
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < minersCount; i++)
         {
             GameObject go = Instantiate(minerGo, transform);
             Miner miner = go.GetComponent<Miner>();
@@ -36,6 +37,12 @@ public class Miners : MonoBehaviour
     private void Update()
     {
         deltaTime = Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Parallel.ForEach(miners, parallelOptions, miner => { miner.ExitMiner(); });
+        }
+
         Parallel.ForEach(miners, parallelOptions, miner => { miner.UpdateMiner(); });
     }
     #endregion

@@ -19,6 +19,7 @@ public class Miner : MonoBehaviour
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnReachDeposit, (int)States.GoToMine);
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnEmptyMine, (int)States.Idle);
         fsm.SetRelation((int)States.Mining, (int)Flags.OnRest, (int)States.Resting);
+        
         fsm.SetRelation((int)States.Resting, (int)Flags.OnFinishedResting, (int)States.GoToMine);
 
         fsm.AddBehaviour((int)States.Idle, new Idle(fsm.SetFlag));
@@ -31,11 +32,15 @@ public class Miner : MonoBehaviour
     public void UpdateMiner()
     {
         fsm.Update();
+    }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            fsm.Exit();
-        }
+    public void ExitMiner()
+    {
+        fsm.Exit();
+    }
+
+    public void TogglePosFlag()
+    {
     }
     #endregion
 }

@@ -555,6 +555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 612388ef7d614ae46aa23e6ecb89963c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minersCount: 100
   minerGo: {fileID: 4248180729916858057, guid: 2b3ccf5280d8a4c4ab362462e26070b5, type: 3}
   mine: {fileID: 1389754306}
   deposit: {fileID: 1500384719}
