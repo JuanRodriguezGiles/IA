@@ -17,30 +17,43 @@ public class Node
     public List<int> adjacentNodeIDs;
     public NodeState state;
     public int openerID;
+    public int weight = 1;
+    private int originalWeight;
+    public int totalWeight;
 
     public Node(int ID, Vector2Int position)
     {
         this.ID = ID;
         this.position = position;
         adjacentNodeIDs = NodeUtils.GetAdjacentsNodeIDs(position);
-
-
+        
         this.state = NodeState.Ready;
 
-
         openerID = -1;
+        originalWeight = weight;
     }
 
-    public void Open(int openerID)
+    public void SetWeight(int weight)
+    {
+        this.weight = weight;
+        originalWeight = weight;
+    }
+    
+    public void Open(int openerID, int parentWeight)
     {
         state = NodeState.Open;
         this.openerID = openerID;
+        totalWeight = parentWeight + weight;
     }
 
     public void Reset()
     {
-        this.state = NodeState.Ready;
-        this.openerID = -1;
+        if (state != NodeState.Obstacle)
+        {
+            this.state = NodeState.Ready;
+            this.openerID = -1;
+            weight = originalWeight;
+        }
     }
 }
 
