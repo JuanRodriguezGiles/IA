@@ -50,7 +50,7 @@ public class GoToDeposit : FSMAction
         {
             Vector2 dir = (currentDestination - miner).normalized;
 
-            if (Vector2.Distance(currentDestination, miner) > 1.0f)
+            if (Vector2.Distance(currentDestination, miner) > 0.1f)
             {
                 var movement = dir * (speed * onGetDeltaTime.Invoke());
                 miner += new Vector3(movement.x, movement.y);
