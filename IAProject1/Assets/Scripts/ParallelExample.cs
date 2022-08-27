@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class ParallelExample : MonoBehaviour
 {
-    void Start()
+    private void Start()
     {
-        ConcurrentBag<int> falopa = new ConcurrentBag<int>
+        var falopa = new ConcurrentBag<int>
         {
             0,
             0,
@@ -19,24 +19,22 @@ public class ParallelExample : MonoBehaviour
             0
         };
 
-        ParallelOptions parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 8 };
+        var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 8 };
 
         Parallel.For(0, falopa.Count, parallelOptions, index =>
         {
-            if (falopa.TryTake(out int result))
+            if (falopa.TryTake(out var result))
             {
                 result++;
                 falopa.Add(result);
             }
         });
 
-        for (int i = 0; i < falopa.Count; i++)
-        {
-            if (falopa.TryTake(out int result))
+        for (var i = 0; i < falopa.Count; i++)
+            if (falopa.TryTake(out var result))
             {
                 Debug.Log(result);
                 falopa.Add(result);
             }
-        }
     }
 }

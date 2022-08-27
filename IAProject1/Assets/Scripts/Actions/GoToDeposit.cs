@@ -1,47 +1,72 @@
 using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
 public class GoToDeposit : FSMAction
 {
+    #region CONSTRUCTOR
+    public GoToDeposit(Action<int> onSetFlag, Func<float> onGetDeltaTime, Action<Vector3> onUpdatePos, Func<Vector3> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Vector3 deposit)
+    {
+        this.onGetPath = onGetPath;
+        this.onGetPos = onGetPos;
+        this.onGetDeltaTime = onGetDeltaTime;
+        this.onSetFlag = onSetFlag;
+        this.onUpdatePos = onUpdatePos;
+
+        this.deposit = deposit;
+    }
+    #endregion
+
     #region PRIVATE_FIELDS
-    private readonly Vector3 deposit;
-    private readonly Transform miner;
-    private const float speed = 10.0f;
+    private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
+    private readonly Action<Vector3> onUpdatePos;
     private readonly Func<float> onGetDeltaTime;
+    private readonly Func<Vector3> onGetPos;
+
+    private readonly Vector3 deposit;
+    private List<Vector2Int> path;
+    private Vector3 miner;
+    private Vector3 currentDestination;
+    private int posIndex;
+
+    private const float speed = 10.0f;
     #endregion
 
     #region OVERRIDE
     public override void Execute()
     {
-        Vector2 dir = (deposit - miner.position).normalized;
-
-        if (Vector2.Distance(deposit, miner.position) > 1.0f)
+        if (path == null)
         {
-            Vector2 movement = dir * (speed * onGetDeltaTime.Invoke());
-            miner.position += new Vector3(movement.x, movement.y);
+            miner = onGetPos.Invoke();
+
+            path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), new Vector2Int((int)deposit.x, (int)deposit.y));
+
+            posIndex = 0;
+
+            currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
         }
         else
         {
-            // if (mineUses <= 0)
-            // {
-            //     onSetFlag?.Invoke((int)Flags.OnEmptyMine);
-            // }
-            // else
+            Vector2 dir = (currentDestination - miner).normalized;
+
+            if (Vector2.Distance(currentDestination, miner) > 1.0f)
             {
+                var movement = dir * (speed * onGetDeltaTime.Invoke());
+                miner += new Vector3(movement.x, movement.y);
+                onUpdatePos?.Invoke(miner);
+            }
+            else if (posIndex >= path.Count - 1)
+            {
+                path = null;
                 onSetFlag?.Invoke((int)Flags.OnReachDeposit);
             }
+            else
+            {
+                posIndex++;
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+            }
         }
-    }
-    #endregion
-
-    #region CONSTRUCTOR
-    public GoToDeposit(Action<int> onSetFlag, Func<float> onGetDeltaTime, Vector3 deposit, Transform miner)
-    {
-        this.onGetDeltaTime = onGetDeltaTime;
-        this.onSetFlag = onSetFlag;
-        this.deposit = deposit;
-        this.miner = miner;
     }
     #endregion
 }

@@ -5,16 +5,31 @@ using UnityEngine;
 
 public class GoToMine : FSMAction
 {
+    #region CONSTRUCTOR
+    public GoToMine(Action<int> onSetFlag, Func<float> onGetDeltaTime, Action<Vector3> onUpdatePos, Func<Vector3> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Vector3 mine)
+    {
+        this.onGetPath = onGetPath;
+        this.onGetPos = onGetPos;
+        this.onGetDeltaTime = onGetDeltaTime;
+        this.onUpdatePos = onUpdatePos;
+        this.onSetFlag = onSetFlag;
+        this.mine = mine;
+    }
+    #endregion
+
     #region PRIVATE_FIELDS
-    private readonly Vector3 mine;
-    private readonly Transform miner;
-    private const float speed = 10.0f;
+    private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
+    private readonly Action<Vector3> onUpdatePos;
     private readonly Func<float> onGetDeltaTime;
-    private List<Vector2Int> path = null;
-    private Pathfinding pathfinding;
-    private Node[] map;
+    private readonly Func<Vector3> onGetPos;
+
+    private readonly Vector3 mine;
+    private List<Vector2Int> path;
+    private Vector3 miner;
     private Vector3 currentDestination;
-    private int posIndex = 0;
+    private int posIndex;
+
+    private const float speed = 10.0f;
     #endregion
 
     #region OVERRIDE
@@ -22,55 +37,35 @@ public class GoToMine : FSMAction
     {
         if (path == null)
         {
-            map = new Node[10 * 10];
-            NodeUtils.MapSize = new Vector2Int(10, 10);
-            int ID = 0;
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 10; j++)
-                {
-                    map[ID] = new Node(ID, new Vector2Int(j, i));
-                    ID++;
-                }
-            }
-            
-            map[NodeUtils.PositionToIndex(new Vector2Int(5, 3))].state = Node.NodeState.Obstacle;
-            map[NodeUtils.PositionToIndex(new Vector2Int(4, 3))].state = Node.NodeState.Obstacle;
-            map[NodeUtils.PositionToIndex(new Vector2Int(3, 3))].state = Node.NodeState.Obstacle;
+            miner = onGetPos.Invoke();
 
-            pathfinding = new Pathfinding();
-            path = pathfinding.GetPath(map, map[NodeUtils.PositionToIndex(new Vector2Int((int)miner.position.x, (int)miner.position.y))],
-                map[NodeUtils.PositionToIndex(new Vector2Int((int)mine.x, (int)mine.y))]);
+            path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), new Vector2Int((int)mine.x, (int)mine.y));
+
+            posIndex = 0;
 
             currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-        }
-        
-        Vector2 dir = (currentDestination - miner.position).normalized;
-
-        if (Vector2.Distance(currentDestination, miner.position) > 1.0f)
-        {
-            Vector2 movement = dir * (speed * onGetDeltaTime.Invoke());
-            miner.position += new Vector3(movement.x, movement.y);
-        }
-        else if (posIndex >= path.Count - 1) 
-        {
-            onSetFlag?.Invoke((int)Flags.OnReachMine);
         }
         else
         {
-            posIndex++;
-            currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-        }
-    }
-    #endregion
+            Vector2 dir = (currentDestination - miner).normalized;
 
-    #region CONSTRUCTOR
-    public GoToMine(Action<int> onSetFlag, Func<float> onGetDeltaTime, Vector3 mine, Transform miner)
-    {
-        this.onGetDeltaTime = onGetDeltaTime;
-        this.onSetFlag = onSetFlag;
-        this.mine = mine;
-        this.miner = miner;
+            if (Vector2.Distance(currentDestination, miner) > 1.0f)
+            {
+                var movement = dir * (speed * onGetDeltaTime.Invoke());
+                miner += new Vector3(movement.x, movement.y);
+                onUpdatePos?.Invoke(miner);
+            }
+            else if (posIndex >= path.Count - 1)
+            {
+                path = null;
+                onSetFlag?.Invoke((int)Flags.OnReachMine);
+            }
+            else
+            {
+                posIndex++;
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+            }
+        }
     }
     #endregion
 }

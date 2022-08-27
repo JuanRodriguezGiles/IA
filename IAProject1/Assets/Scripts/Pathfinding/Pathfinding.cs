@@ -18,7 +18,7 @@ public class Pathfinding
     private List<int> closedNodesID = new List<int>();
     private Vector2Int destionationPos;
 
-    public List<Vector2Int> GetPath(Node[] map, Node origin, Node destination)
+    public List<Vector2Int>  GetPath(Node[] map, Node origin, Node destination)
     {
         openNodesID.Add(origin.ID);
         destionationPos = destination.position;
@@ -54,6 +54,8 @@ public class Pathfinding
         foreach (Node node in map)
         {
             node.Reset();
+            openNodesID.Clear();
+            closedNodesID.Clear();
         }
 
         return path;
