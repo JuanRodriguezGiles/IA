@@ -83,10 +83,8 @@ public class Pathfinding
         {
             case Methods.BreadthFirst:
                 return map[openNodesID[0]];
-                break;
             case Methods.DepthFirst:
                 return map[openNodesID[^1]];
-                break;
             case Methods.Dijkstra:
             {
                 Node n = null;

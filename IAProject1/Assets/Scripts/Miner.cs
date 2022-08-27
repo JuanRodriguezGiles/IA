@@ -32,6 +32,14 @@ public class Miner : MonoBehaviour
             }
         }
 
+        map[NodeUtils.PositionToIndex(new Vector2Int(4, 3))].state = Node.NodeState.Obstacle;
+        map[NodeUtils.PositionToIndex(new Vector2Int(5, 3))].state = Node.NodeState.Obstacle;
+        map[NodeUtils.PositionToIndex(new Vector2Int(6, 3))].state = Node.NodeState.Obstacle;
+        
+        map[NodeUtils.PositionToIndex(new Vector2Int(0, 3))].state = Node.NodeState.Obstacle;
+        map[NodeUtils.PositionToIndex(new Vector2Int(1, 3))].state = Node.NodeState.Obstacle;
+        map[NodeUtils.PositionToIndex(new Vector2Int(2, 3))].state = Node.NodeState.Obstacle;
+        
         pathfinding = new Pathfinding();
         this.currentPos = currentPos;
         //--------------------------------------------------------------------------------

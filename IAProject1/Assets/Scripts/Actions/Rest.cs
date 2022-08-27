@@ -37,22 +37,6 @@ public class Rest : FSMAction
     #region OVERRIDE
     public override void Execute()
     {
-        // Vector2 dir = (restPos - miner.position).normalized;
-        //
-        // if (Vector2.Distance(restPos, miner.position) > 1.0f)
-        // {
-        //     var movement = dir * (speed * onGetDeltaTime.Invoke());
-        //     miner.position += new Vector3(movement.x, movement.y);
-        // }
-        // else if (currentRestTime < restTime)
-        // {
-        //     currentRestTime += onGetDeltaTime.Invoke();
-        // }
-        // else
-        // {
-        //     currentRestTime = 0;
-        //     onSetFlag?.Invoke((int)Flags.OnFinishedResting);
-        // }
         if (path == null)
         {
             miner = onGetPos.Invoke();
