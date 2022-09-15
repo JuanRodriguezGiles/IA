@@ -5,66 +5,57 @@ using UnityEngine;
 
 public class GoToMine : FSMAction
 {
-    #region CONSTRUCTOR
-    public GoToMine(Action<int> onSetFlag, Func<float> onGetDeltaTime, Action<Vector3> onUpdatePos, Func<Vector3> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Vector3 mine)
-    {
-        this.onGetPath = onGetPath;
-        this.onGetPos = onGetPos;
-        this.onGetDeltaTime = onGetDeltaTime;
-        this.onUpdatePos = onUpdatePos;
-        this.onSetFlag = onSetFlag;
-        this.mine = mine;
-    }
-    #endregion
-
     #region PRIVATE_FIELDS
     private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
-    private readonly Action<Vector3> onUpdatePos;
-    private readonly Func<float> onGetDeltaTime;
-    private readonly Func<Vector3> onGetPos;
+    private Action<Vector2Int> onUpdateTarget;
+    private readonly Func<Vector2> onGetPos;
 
-    private readonly Vector3 mine;
-    private List<Vector2Int> path;
-    private Vector3 miner;
     private Vector3 currentDestination;
+    private readonly Vector2Int mine;
+    private List<Vector2Int> path;
+    private Vector2 miner;
     private int posIndex;
+    #endregion
 
-    private const float speed = 10.0f;
+    #region CONSTRUCTOR
+    public GoToMine(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int mine)
+    {
+        this.onSetFlag = onSetFlag;
+        this.onGetPos = onGetPos;
+        this.onGetPath = onGetPath;
+        this.onUpdateTarget = onUpdateTarget;
+        this.mine = mine;
+    }
     #endregion
 
     #region OVERRIDE
     public override void Execute()
     {
+        miner = onGetPos.Invoke();
+
         if (path == null)
         {
-            miner = onGetPos.Invoke();
-
-            path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), new Vector2Int((int)mine.x, (int)mine.y));
+            path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), mine);
 
             posIndex = 0;
 
             currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-        }
-        else
-        {
-            Vector2 dir = (currentDestination - miner).normalized;
 
-            if (Vector2.Distance(currentDestination, miner) > 0.1f)
-            {
-                var movement = dir * (speed * onGetDeltaTime.Invoke());
-                miner += new Vector3(movement.x, movement.y);
-                onUpdatePos?.Invoke(miner);
-            }
-            else if (posIndex >= path.Count - 1)
+            onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+        }
+        else if (Vector2.Distance(currentDestination, miner) < 0.1f)
+        {
+            posIndex++;
+
+            if (posIndex >= path.Count - 1)
             {
                 path = null;
                 onSetFlag?.Invoke((int)Flags.OnReachMine);
+                return;
             }
-            else
-            {
-                posIndex++;
-                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-            }
+
+            currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+            onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
         }
     }
     #endregion

@@ -6,46 +6,33 @@ using UnityEngine;
 public class Miner : MonoBehaviour
 {
     #region PRIVATE_FIELDS
-    private FSM fsm;
+    private FlockingMiners flockingMiners;
     private Pathfinding pathfinding;
     private Node[] map;
+    private FSM fsm;
     #endregion
 
     #region EXPOSED_FIELDS
+    public Vector2 currentPos;
     public bool updatePos;
-    public Vector3 currentPos;
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init(GameObject mine, GameObject deposit, GameObject rest, Vector3 currentPos, Func<float> onGetDeltaTime)
+    public void Init(Vector2Int mine, Vector2Int deposit, Vector2Int rest, Vector2 currentPos, Func<float> onGetDeltaTime)
     {
-        map = new Node[10 * 10];
-        NodeUtils.MapSize = new Vector2Int(10, 10);
+        map = new Node[50 * 50];
+        NodeUtils.MapSize = new Vector2Int(50, 50);
         var id = 0;
 
-        for (var i = 0; i < 10; i++)
+        for (var i = 0; i < 50; i++)
         {
-            for (var j = 0; j < 10; j++)
+            for (var j = 0; j < 50; j++)
             {
                 map[id] = new Node(id, new Vector2Int(j, i));
                 id++;
             }
         }
 
-
-        map[NodeUtils.PositionToIndex(new Vector2Int(0, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(1, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(2, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(3, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(4, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(5, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(6, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(7, 3))].state = Node.NodeState.Obstacle;
-        
-        map[NodeUtils.PositionToIndex(new Vector2Int(0, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(1, 3))].state = Node.NodeState.Obstacle;
-        map[NodeUtils.PositionToIndex(new Vector2Int(2, 3))].state = Node.NodeState.Obstacle;
-        
         pathfinding = new Pathfinding();
         this.currentPos = currentPos;
         //--------------------------------------------------------------------------------
@@ -55,16 +42,20 @@ public class Miner : MonoBehaviour
         fsm.SetRelation((int)States.Mining, (int)Flags.OnFullInventory, (int)States.GoToDeposit);
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnReachDeposit, (int)States.GoToMine);
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnEmptyMine, (int)States.Idle);
+        
         fsm.SetRelation((int)States.Mining, (int)Flags.OnRest, (int)States.Resting);
         fsm.SetRelation((int)States.Resting, (int)Flags.OnFinishedResting, (int)States.GoToMine);
 
         fsm.AddBehaviour((int)States.Idle, new Idle(fsm.SetFlag));
         fsm.AddBehaviour((int)States.Mining, new Mine(fsm.SetFlag, onGetDeltaTime), () => { fsm.SetFlag((int)Flags.OnRest); });
-        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, onGetDeltaTime, OnUpdatePos, OnGetPos, GetPath, mine.transform.position));
-        fsm.AddBehaviour((int)States.GoToDeposit, new GoToDeposit(fsm.SetFlag, onGetDeltaTime, OnUpdatePos, OnGetPos, GetPath, deposit.transform.position));
-        fsm.AddBehaviour((int)States.Resting, new Rest(fsm.SetFlag, onGetDeltaTime, OnUpdatePos, OnGetPos, GetPath, rest.transform.position));
+        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, GetPos, GetPath, UpdateTarget, mine));
+        fsm.AddBehaviour((int)States.GoToDeposit, new GoToDeposit(fsm.SetFlag, GetPos, GetPath, UpdateTarget, deposit));
+        fsm.AddBehaviour((int)States.Resting, new Rest(fsm.SetFlag, onGetDeltaTime, GetPos, GetPath, UpdateTarget, rest));
 
         fsm.ForceCurrentState((int)States.GoToMine);
+        //--------------------------------------------------------------------------------
+        flockingMiners = GetComponent<FlockingMiners>();
+        flockingMiners.Init(UpdatePos, GetPos);
     }
 
     public void UpdateMiner()
@@ -79,13 +70,19 @@ public class Miner : MonoBehaviour
     #endregion
 
     #region PRIVATE_METHODS
-    private void OnUpdatePos(Vector3 newPos)
+    private void UpdatePos(Vector2 newPos)
     {
         updatePos = true;
         currentPos = newPos;
     }
 
-    private Vector3 OnGetPos()
+    private void UpdateTarget(Vector2Int newTarget)
+    {
+        flockingMiners.ToggleFlocking(true);
+        flockingMiners.UpdateTarget(newTarget);
+    }
+
+    private Vector2 GetPos()
     {
         return currentPos;
     }

@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageDim: {x: 100, y: 100}
-  regionAmount: 5
+  regionAmount: 10
   points:
   - {x: 1, y: 2}
   - {x: 5, y: 3}
