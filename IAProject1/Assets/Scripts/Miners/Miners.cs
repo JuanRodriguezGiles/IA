@@ -6,7 +6,6 @@ using UnityEngine;
 public class Miners : MonoBehaviour
 {
     #region EXPOSED_FIELDS
-    [SerializeField] private int minersCount = 1;
     [SerializeField] private Vector3Int minerSpawnPos;
     [SerializeField] private GameObject minerGo;
     [SerializeField] private GameObject mine;
@@ -17,7 +16,9 @@ public class Miners : MonoBehaviour
     #region PRIVATE_FIELDS
     private ParallelOptions parallelOptions;
     private ConcurrentBag<Miner> miners = new();
-
+    private Vector2Int minePos;
+    private Vector2Int depositPos;
+    private Vector2Int restPos;
     private float deltaTime;
     #endregion
 
@@ -26,18 +27,9 @@ public class Miners : MonoBehaviour
     {
         parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 12 };
         
-        Vector2Int minePos = new Vector2Int((int)mine.transform.position.x, (int)mine.transform.position.y);        
-        Vector2Int depositPos = new Vector2Int((int)deposit.transform.position.x, (int)deposit.transform.position.y);        
-        Vector2Int restPos = new Vector2Int((int)rest.transform.position.x, (int)rest.transform.position.y);        
-        
-        for (var i = 0; i < minersCount; i++)
-        {
-            var go = Instantiate(minerGo, minerSpawnPos, Quaternion.identity, transform);
-            var miner = go.GetComponent<Miner>();
-            miner.Init(minePos, depositPos, restPos, miner.transform.position, GetDeltaTime);
-
-            miners.Add(miner);
-        }
+        minePos = new Vector2Int((int)mine.transform.position.x, (int)mine.transform.position.y);        
+        depositPos = new Vector2Int((int)deposit.transform.position.x, (int)deposit.transform.position.y);        
+        restPos = new Vector2Int((int)rest.transform.position.x, (int)rest.transform.position.y);
     }
 
     private void Update()
@@ -65,6 +57,17 @@ public class Miners : MonoBehaviour
     }
     #endregion
 
+    #region PUBLIC_METHODS
+    public void SpawnMiner()
+    {
+        var go = Instantiate(minerGo, minerSpawnPos, Quaternion.identity, transform);
+        var miner = go.GetComponent<Miner>();
+        miner.Init(minePos, depositPos, restPos, miner.transform.position, GetDeltaTime);
+
+        miners.Add(miner);
+    }
+    #endregion
+    
     #region PRIVATE_METHODS
     private float GetDeltaTime()
     {

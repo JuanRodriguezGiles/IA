@@ -50,7 +50,7 @@ public class FlockingMiners : MonoBehaviour
         if (boids.Any())
             acceleration = Alignment(boids) * alignmentMultiplayer + Separation(boids) * separationMultiplayer + Cohesion(boids) * cohesionMultiplayer + DirectionToTarget();
         else
-            acceleration = Vector2.zero;
+            acceleration = DirectionToTarget();
 
         velocity += acceleration;
         velocity = LimitMagnitude(velocity, maxSpeed);
