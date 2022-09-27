@@ -46,6 +46,11 @@ public class Miners : MonoBehaviour
         
         InitBuildings();
         InitMap();
+        
+        for (int i = 0; i < minesCount; i++)
+        {
+            SpawnMine();
+        }
     }
 
     private void Update()
@@ -98,11 +103,6 @@ public class Miners : MonoBehaviour
             Vector2Int pos = new Vector2Int((int)wall.transform.position.x, (int)wall.transform.position.y);
             buildings.Add(pos);
         }
-
-        for (int i = 0; i < minesCount; i++)
-        {
-            SpawnMine();
-        }
     }
     private void InitMap()
     {
@@ -115,6 +115,15 @@ public class Miners : MonoBehaviour
             for (var j = 0; j < mapSize.y; j++)
             {
                 map[id] = new Node(id, new Vector2Int(j, i));
+
+                for (int k = 0; k < buildings.Count; k++)
+                {
+                    if (map[id].position == buildings[k])
+                    {
+                        map[id].state = Node.NodeState.Obstacle;
+                    }
+                }
+                
                 id++;
             }
         }
