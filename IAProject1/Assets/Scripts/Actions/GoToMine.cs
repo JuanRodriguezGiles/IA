@@ -8,23 +8,26 @@ public class GoToMine : FSMAction
     #region PRIVATE_FIELDS
     private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
     private Action<Vector2Int> onUpdateTarget;
+    private Action<Vector2Int> onUpdateMine;
     private readonly Func<Vector2> onGetPos;
+    private Func<Vector2Int> onGetMine;
 
     private Vector3 currentDestination;
-    private readonly Vector2Int mine;
     private List<Vector2Int> path;
+    private Vector2Int mine;
     private Vector2 miner;
     private int posIndex;
     #endregion
 
     #region CONSTRUCTOR
-    public GoToMine(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int mine)
+    public GoToMine(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Func<Vector2Int> onGetMine, Action<Vector2Int> onUpdateMine)
     {
         this.onSetFlag = onSetFlag;
         this.onGetPos = onGetPos;
         this.onGetPath = onGetPath;
         this.onUpdateTarget = onUpdateTarget;
-        this.mine = mine;
+        this.onGetMine = onGetMine;
+        this.onUpdateMine = onUpdateMine;
     }
     #endregion
 
@@ -35,6 +38,9 @@ public class GoToMine : FSMAction
 
         if (path == null)
         {
+            mine = onGetMine.Invoke();
+            onUpdateMine?.Invoke(mine);
+
             path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), mine);
 
             posIndex = 0;

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 using UnityEngine;
@@ -8,15 +9,14 @@ public class Miners : MonoBehaviour
     #region EXPOSED_FIELDS
     [SerializeField] private Vector3Int minerSpawnPos;
     [SerializeField] private GameObject minerGo;
-    [SerializeField] private GameObject mine;
+    [SerializeField] private List<GameObject> mines;
     [SerializeField] private GameObject deposit;
     [SerializeField] private GameObject rest;
     #endregion
 
     #region PRIVATE_FIELDS
-    private ParallelOptions parallelOptions;
     private ConcurrentBag<Miner> miners = new();
-    private Vector2Int minePos;
+    private ParallelOptions parallelOptions;
     private Vector2Int depositPos;
     private Vector2Int restPos;
     private float deltaTime;
@@ -26,9 +26,8 @@ public class Miners : MonoBehaviour
     private void Start()
     {
         parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 12 };
-        
-        minePos = new Vector2Int((int)mine.transform.position.x, (int)mine.transform.position.y);        
-        depositPos = new Vector2Int((int)deposit.transform.position.x, (int)deposit.transform.position.y);        
+
+        depositPos = new Vector2Int((int)deposit.transform.position.x, (int)deposit.transform.position.y);
         restPos = new Vector2Int((int)rest.transform.position.x, (int)rest.transform.position.y);
     }
 
@@ -49,11 +48,8 @@ public class Miners : MonoBehaviour
         {
             Parallel.ForEach(miners, parallelOptions, miner => { miner.ExitMiner(); });
         }
-        
-        Parallel.ForEach(miners, parallelOptions, miner =>
-        {
-            miner.UpdateMiner();
-        });
+
+        Parallel.ForEach(miners, parallelOptions, miner => { miner.UpdateMiner(); });
     }
     #endregion
 
@@ -62,16 +58,44 @@ public class Miners : MonoBehaviour
     {
         var go = Instantiate(minerGo, minerSpawnPos, Quaternion.identity, transform);
         var miner = go.GetComponent<Miner>();
-        miner.Init(minePos, depositPos, restPos, miner.transform.position, GetDeltaTime);
+        miner.Init(depositPos, restPos, miner.transform.position, GetDeltaTime, GetMine, OnEmptyMine);
 
         miners.Add(miner);
     }
+
+    public void SpawnMine()
+    {
+    }
     #endregion
-    
+
     #region PRIVATE_METHODS
     private float GetDeltaTime()
     {
         return deltaTime;
+    }
+
+    private Vector2Int GetMine()
+    {
+        int index = Random.Range(0, mines.Count);
+
+        Vector2Int pos = new Vector2Int((int)mines[index].transform.position.x, (int)mines[index].transform.position.y);
+
+        return pos;
+    }
+
+    private void OnEmptyMine(Vector2Int minePos)
+    {
+        Vector2Int pos;
+        for (int i = 0; i < mines.Count; i++)
+        {
+            pos = new Vector2Int((int)mines[i].transform.position.x, (int)mines[i].transform.position.y);
+            if (minePos == pos)
+            {
+                Destroy(mines[i]);
+                mines.RemoveAt(i);
+                break;
+            }
+        }
     }
     #endregion
 }

@@ -2,21 +2,23 @@ using System;
 
 public class Mine : FSMAction
 {
-    #region CONSTRUCTOR
-    public Mine(Action<int> onSetFlag, Func<float> onGetDeltaTime)
-    {
-        this.onGetDeltaTime = onGetDeltaTime;
-        this.onSetFlag = onSetFlag;
-    }
-    #endregion
-
     #region PRIVATE_FIELDS
     private readonly Func<float> onGetDeltaTime;
+    private Action onEmptyMine;
 
     private float currentMiningTime = 0;
     private int mineUses = 10;
 
     private const float miningTime = 2.0f;
+    #endregion
+
+    #region CONSTRUCTOR
+    public Mine(Action<int> onSetFlag, Func<float> onGetDeltaTime, Action onEmptyMine)
+    {
+        this.onGetDeltaTime = onGetDeltaTime;
+        this.onSetFlag = onSetFlag;
+        this.onEmptyMine = onEmptyMine;
+    }
     #endregion
 
     #region OVERRIDE
@@ -29,8 +31,15 @@ public class Mine : FSMAction
         else
         {
             currentMiningTime = 0.0f;
-            onSetFlag?.Invoke((int)Flags.OnFullInventory);
+
             mineUses--;
+
+            if (mineUses == 0)
+            {
+                mineUses = 10;
+                onEmptyMine?.Invoke();
+            }
+            onSetFlag?.Invoke((int)Flags.OnFullInventory);
         }
     }
     #endregion
