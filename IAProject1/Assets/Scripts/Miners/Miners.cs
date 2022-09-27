@@ -12,11 +12,12 @@ public class Miners : MonoBehaviour
     [Header("Config")]
     [SerializeField] private Vector3Int minerSpawnPos;
     [SerializeField] private int minesCount;
+    [SerializeField] private Vector2Int mapSize;
     [SerializeField] private Transform minesParent;
+    [SerializeField] private Transform wallsParent;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject depositGo;
-
     [SerializeField] private GameObject minerGo;
     [SerializeField] private GameObject mineGo;
     [SerializeField] private GameObject restGo;
@@ -25,13 +26,14 @@ public class Miners : MonoBehaviour
     #region PRIVATE_FIELDS
     [Header("Data")]
     [SerializeField] private List<Vector2Int> buildings = new();
-
     [SerializeField] private List<GameObject> mines;
+    
     private ConcurrentBag<Miner> miners = new();
     private ParallelOptions parallelOptions;
     private Vector2Int depositPos;
     private Vector2Int restPos;
     private float deltaTime;
+    private Node[] map;
     #endregion
 
     #region UNITY_CALLS
@@ -41,19 +43,9 @@ public class Miners : MonoBehaviour
 
         depositPos = new Vector2Int((int)depositGo.transform.position.x, (int)depositGo.transform.position.y);
         restPos = new Vector2Int((int)restGo.transform.position.x, (int)restGo.transform.position.y);
-
-        buildings.Add(depositPos);
-
-        for (int i = 0; i < mines.Count; i++)
-        {
-            Vector2Int pos = new Vector2Int((int)mines[i].transform.position.x, (int)mines[i].transform.position.y);
-            buildings.Add(pos);
-        }
-
-        for (int i = 0; i < minesCount; i++)
-        {
-            SpawnMine();
-        }
+        
+        InitBuildings();
+        InitMap();
     }
 
     private void Update()
@@ -83,13 +75,51 @@ public class Miners : MonoBehaviour
     {
         var go = Instantiate(minerGo, minerSpawnPos, Quaternion.identity, transform);
         var miner = go.GetComponent<Miner>();
-        miner.Init(depositPos, restPos, miner.transform.position, GetDeltaTime, GetMine, OnEmptyMine);
+        miner.Init(depositPos, restPos, miner.transform.position, GetDeltaTime, GetMine, OnEmptyMine, GetMap);
 
         miners.Add(miner);
     }
     #endregion
 
     #region PRIVATE_METHODS
+    private void InitBuildings()
+    {
+        buildings.Add(depositPos);
+
+        for (int i = 0; i < mines.Count; i++)
+        {
+            Vector2Int pos = new Vector2Int((int)mines[i].transform.position.x, (int)mines[i].transform.position.y);
+            buildings.Add(pos);
+        }
+
+        for (int i = 0; i < wallsParent.childCount; i++)
+        {
+            Transform wall = wallsParent.GetChild(i);
+            Vector2Int pos = new Vector2Int((int)wall.transform.position.x, (int)wall.transform.position.y);
+            buildings.Add(pos);
+        }
+
+        for (int i = 0; i < minesCount; i++)
+        {
+            SpawnMine();
+        }
+    }
+    private void InitMap()
+    {
+        map = new Node[mapSize.x * mapSize.y];
+        NodeUtils.MapSize = new Vector2Int(mapSize.x, mapSize.y);
+        var id = 0;
+
+        for (var i = 0; i < mapSize.x; i++)
+        {
+            for (var j = 0; j < mapSize.y; j++)
+            {
+                map[id] = new Node(id, new Vector2Int(j, i));
+                id++;
+            }
+        }
+    }
+    
     private void SpawnMine()
     {
         int x = Random.Range(0, 50);
@@ -140,6 +170,11 @@ public class Miners : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private Node[] GetMap()
+    {
+        return map;
     }
     #endregion
 }

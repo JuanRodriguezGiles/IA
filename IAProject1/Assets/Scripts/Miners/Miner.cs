@@ -9,7 +9,7 @@ public class Miner : MonoBehaviour
     private Action<Vector2Int> onEmptyMine;
     private FlockingMiners flockingMiners;
     private Pathfinding pathfinding;
-    private Node[] map;
+    private Func<Node[]> onGetMap;
     private FSM fsm;
     #endregion
 
@@ -20,21 +20,8 @@ public class Miner : MonoBehaviour
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init(Vector2Int deposit, Vector2Int rest, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine)
+    public void Init(Vector2Int deposit, Vector2Int rest, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine, Func<Node[]> onGetMap)
     {
-        map = new Node[50 * 50];
-        NodeUtils.MapSize = new Vector2Int(50, 50);
-        var id = 0;
-
-        for (var i = 0; i < 50; i++)
-        {
-            for (var j = 0; j < 50; j++)
-            {
-                map[id] = new Node(id, new Vector2Int(j, i));
-                id++;
-            }
-        }
-
         pathfinding = new Pathfinding();
         this.currentPos = currentPos;
         //--------------------------------------------------------------------------------
@@ -63,6 +50,7 @@ public class Miner : MonoBehaviour
         flockingMiners.Init(UpdatePos, GetPos);
 
         this.onEmptyMine = onEmptyMine;
+        this.onGetMap = onGetMap;
     }
 
     public void UpdateMiner()
@@ -96,6 +84,7 @@ public class Miner : MonoBehaviour
 
     private List<Vector2Int> GetPath(Vector2Int origin, Vector2Int destination)
     {
+        Node[] map = onGetMap.Invoke();
         return pathfinding.GetPath(map, map[NodeUtils.PositionToIndex(origin)], map[NodeUtils.PositionToIndex(destination)]);
     }
 
