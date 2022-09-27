@@ -4,17 +4,29 @@ using System.Collections.Concurrent;
 
 using UnityEngine;
 
+using Random = UnityEngine.Random;
+
 public class Miners : MonoBehaviour
 {
     #region EXPOSED_FIELDS
+    [Header("Config")]
     [SerializeField] private Vector3Int minerSpawnPos;
+    [SerializeField] private int minesCount;
+    [SerializeField] private Transform minesParent;
+
+    [Header("Prefabs")]
+    [SerializeField] private GameObject depositGo;
+
     [SerializeField] private GameObject minerGo;
-    [SerializeField] private List<GameObject> mines;
-    [SerializeField] private GameObject deposit;
-    [SerializeField] private GameObject rest;
+    [SerializeField] private GameObject mineGo;
+    [SerializeField] private GameObject restGo;
     #endregion
 
     #region PRIVATE_FIELDS
+    [Header("Data")]
+    [SerializeField] private List<Vector2Int> buildings = new();
+
+    [SerializeField] private List<GameObject> mines;
     private ConcurrentBag<Miner> miners = new();
     private ParallelOptions parallelOptions;
     private Vector2Int depositPos;
@@ -27,8 +39,21 @@ public class Miners : MonoBehaviour
     {
         parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = 12 };
 
-        depositPos = new Vector2Int((int)deposit.transform.position.x, (int)deposit.transform.position.y);
-        restPos = new Vector2Int((int)rest.transform.position.x, (int)rest.transform.position.y);
+        depositPos = new Vector2Int((int)depositGo.transform.position.x, (int)depositGo.transform.position.y);
+        restPos = new Vector2Int((int)restGo.transform.position.x, (int)restGo.transform.position.y);
+
+        buildings.Add(depositPos);
+
+        for (int i = 0; i < mines.Count; i++)
+        {
+            Vector2Int pos = new Vector2Int((int)mines[i].transform.position.x, (int)mines[i].transform.position.y);
+            buildings.Add(pos);
+        }
+
+        for (int i = 0; i < minesCount; i++)
+        {
+            SpawnMine();
+        }
     }
 
     private void Update()
@@ -62,13 +87,31 @@ public class Miners : MonoBehaviour
 
         miners.Add(miner);
     }
-
-    public void SpawnMine()
-    {
-    }
     #endregion
 
     #region PRIVATE_METHODS
+    private void SpawnMine()
+    {
+        int x = Random.Range(0, 50);
+        int y = Random.Range(0, 50);
+        Vector2Int pos = new Vector2Int(x, y);
+
+        for (int i = 0; i < buildings.Count; i++)
+        {
+            if (pos == buildings[i])
+            {
+                SpawnMine();
+                return;
+            }
+        }
+
+        Vector3 posVec3 = new Vector3(pos.x, pos.y, 0);
+        var go = Instantiate(mineGo, posVec3, Quaternion.identity, minesParent);
+        
+        mines.Add(go);
+        buildings.Add(pos);
+    }
+    
     private float GetDeltaTime()
     {
         return deltaTime;
@@ -91,6 +134,7 @@ public class Miners : MonoBehaviour
             pos = new Vector2Int((int)mines[i].transform.position.x, (int)mines[i].transform.position.y);
             if (minePos == pos)
             {
+                buildings.Remove(pos);
                 Destroy(mines[i]);
                 mines.RemoveAt(i);
                 break;
