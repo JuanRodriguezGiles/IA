@@ -127,7 +127,8 @@ public class Miners : MonoBehaviour
             for (var j = 0; j < mapSize.y; j++)
             {
                 map[id] = new Node(id, new Vector2Int(j, i));
-
+                map[id].SetWeight(Random.Range(1, 6));
+                
                 for (int k = 0; k < buildings.Count; k++)
                 {
                     if (map[id].position == buildings[k])

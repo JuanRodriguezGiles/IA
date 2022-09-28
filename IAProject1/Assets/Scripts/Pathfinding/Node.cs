@@ -19,7 +19,7 @@ public class Node
     [HideInInspector] public List<int> adjacentNodeIDs;
     [HideInInspector] public NodeState state;
     [HideInInspector] public int openerID;
-    [HideInInspector] public int weight = 1;
+    public int weight = 1;
     private int originalWeight;
     public int totalWeight;
 
