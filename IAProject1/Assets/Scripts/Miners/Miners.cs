@@ -21,19 +21,19 @@ public class Miners : MonoBehaviour
     [SerializeField] private GameObject minerGo;
     [SerializeField] private GameObject mineGo;
     [SerializeField] private GameObject restGo;
-    #endregion
-
-    #region PRIVATE_FIELDS
+    
     [Header("Data")]
     [SerializeField] private List<Vector2Int> buildings = new();
     [SerializeField] private List<GameObject> mines;
-    
+    #endregion
+
+    #region PRIVATE_FIELDS
     private ConcurrentBag<Miner> miners = new();
     private ParallelOptions parallelOptions;
     private Vector2Int depositPos;
     private Vector2Int restPos;
     private float deltaTime;
-    private Node[] map;
+    [SerializeField] private Node[] map;
     #endregion
 
     #region UNITY_CALLS
@@ -43,10 +43,10 @@ public class Miners : MonoBehaviour
 
         depositPos = new Vector2Int((int)depositGo.transform.position.x, (int)depositGo.transform.position.y);
         restPos = new Vector2Int((int)restGo.transform.position.x, (int)restGo.transform.position.y);
-        
+
         InitBuildings();
         InitMap();
-        
+
         for (int i = 0; i < minesCount; i++)
         {
             SpawnMine();
@@ -84,6 +84,17 @@ public class Miners : MonoBehaviour
 
         miners.Add(miner);
     }
+
+    public void UpdateWeight(Vector2Int nodePos, int nodeWeight)
+    {
+        for (int i = 0; i < map.Length; i++)
+        {
+            if (map[i].position == nodePos)
+            {
+                map[i].SetWeight(nodeWeight);
+            }
+        }
+    }
     #endregion
 
     #region PRIVATE_METHODS
@@ -104,6 +115,7 @@ public class Miners : MonoBehaviour
             buildings.Add(pos);
         }
     }
+
     private void InitMap()
     {
         map = new Node[mapSize.x * mapSize.y];
@@ -123,12 +135,12 @@ public class Miners : MonoBehaviour
                         map[id].state = Node.NodeState.Obstacle;
                     }
                 }
-                
+
                 id++;
             }
         }
     }
-    
+
     private void SpawnMine()
     {
         int x = Random.Range(0, 50);
@@ -146,11 +158,11 @@ public class Miners : MonoBehaviour
 
         Vector3 posVec3 = new Vector3(pos.x, pos.y, 0);
         var go = Instantiate(mineGo, posVec3, Quaternion.identity, minesParent);
-        
+
         mines.Add(go);
         buildings.Add(pos);
     }
-    
+
     private float GetDeltaTime()
     {
         return deltaTime;

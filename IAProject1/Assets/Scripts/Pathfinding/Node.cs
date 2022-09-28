@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 
+[Serializable]
 public class Node
 {
     public enum NodeState
@@ -12,12 +14,12 @@ public class Node
         Obstacle
     }
 
-    public int ID;
+    [HideInInspector] public int ID;
     public Vector2Int position;
-    public List<int> adjacentNodeIDs;
-    public NodeState state;
-    public int openerID;
-    public int weight = 1;
+    [HideInInspector] public List<int> adjacentNodeIDs;
+    [HideInInspector] public NodeState state;
+    [HideInInspector] public int openerID;
+    [HideInInspector] public int weight = 1;
     private int originalWeight;
     public int totalWeight;
 
@@ -26,7 +28,7 @@ public class Node
         this.ID = ID;
         this.position = position;
         adjacentNodeIDs = NodeUtils.GetAdjacentsNodeIDs(position);
-        
+
         this.state = NodeState.Ready;
 
         openerID = -1;
@@ -38,7 +40,7 @@ public class Node
         this.weight = weight;
         originalWeight = weight;
     }
-    
+
     public void Open(int openerID, int parentWeight)
     {
         state = NodeState.Open;

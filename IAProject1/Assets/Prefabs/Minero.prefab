@@ -99,8 +99,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0cab418a28be794d989f14c816b2cea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentPos: {x: 0, y: 0}
+  currentMine: {x: 0, y: 0}
   updatePos: 0
-  currentPos: {x: 0, y: 0, z: 0}
 --- !u!114 &-8820886463820660354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +118,7 @@ MonoBehaviour:
   maxSpeed: 5
   maxForce: 0.5
   checkRadius: 1
-  separationMultiplayer: 1.5
+  separationMultiplayer: 1.2
   cohesionMultiplayer: 1
   alignmentMultiplayer: 1
   velocity: {x: 0, y: 0}

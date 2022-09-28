@@ -931,6 +931,7 @@ MonoBehaviour:
   restGo: {fileID: 1962978784}
   buildings: []
   mines: []
+  map: []
 --- !u!4 &1996668018
 Transform:
   m_ObjectHideFlags: 0
