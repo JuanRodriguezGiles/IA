@@ -9,6 +9,7 @@ public class GoToDeposit : FSMAction
     private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
     private Action<Vector2Int> onUpdateTarget;
     private readonly Func<Vector2> onGetPos;
+    private Func<bool> rePath;
 
     private Vector3 currentDestination;
     private readonly Vector2Int deposit;
@@ -18,13 +19,14 @@ public class GoToDeposit : FSMAction
     #endregion
 
     #region CONSTRUCTOR
-    public GoToDeposit(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int deposit)
+    public GoToDeposit(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int deposit, Func<bool> rePath)
     {
         this.onSetFlag = onSetFlag;
         this.onGetPos = onGetPos;
         this.onGetPath = onGetPath;
         this.onUpdateTarget = onUpdateTarget;
         this.deposit = deposit;
+        this.rePath = rePath;
     }
     #endregion
 
@@ -45,23 +47,35 @@ public class GoToDeposit : FSMAction
         }
         else if (Vector2.Distance(currentDestination, miner) < 0.1f)
         {
-            posIndex++;
-
-            if (posIndex >= path.Count - 1)
+            if (rePath.Invoke())
             {
-                path = null;
-                onSetFlag?.Invoke((int)Flags.OnReachDeposit);
-                return;
-            }
+                path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), deposit);
 
-            currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-            onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+                posIndex = 0;
+
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+
+                onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+            }
+            else
+            {
+                posIndex++;
+
+                if (posIndex >= path.Count - 1)
+                {
+                    path = null;
+                    onSetFlag?.Invoke((int)Flags.OnReachDeposit);
+                    return;
+                }
+
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+                onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+            }
         }
     }
 
     public override void AbruptExit()
     {
-        
     }
     #endregion
 }

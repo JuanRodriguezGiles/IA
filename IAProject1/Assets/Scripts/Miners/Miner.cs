@@ -17,10 +17,11 @@ public class Miner : MonoBehaviour
     public Vector2 currentPos;
     public Vector2Int currentMine;
     public bool updatePos;
+    private bool updatePath = false;
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init(Vector2Int deposit, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine, Func<Node[]> onGetMap)
+    public void Init(Vector2Int deposit, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine, Func<Node[]> onGetMap, ref Action onUpdateWeight)
     {
         pathfinding = new Pathfinding();
         this.currentPos = currentPos;
@@ -40,9 +41,9 @@ public class Miner : MonoBehaviour
         //Behaviours
         fsm.AddBehaviour((int)States.Idle, new Idle(fsm.SetFlag));
         fsm.AddBehaviour((int)States.Mining, new Mine(fsm.SetFlag, onGetDeltaTime, OnEmptyMine), () => { fsm.SetFlag((int)Flags.OnAbruptReturn); });
-        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, GetPos, GetPath, UpdateTarget, onGetMine, UpdateMine), () => { fsm.SetFlag((int)Flags.OnAbruptReturn); });
-        fsm.AddBehaviour((int)States.GoToDeposit, new GoToDeposit(fsm.SetFlag, GetPos, GetPath, UpdateTarget, deposit));
-        fsm.AddBehaviour((int)States.Resting, new AbruptReturn(fsm.SetFlag, onGetDeltaTime, GetPos, GetPath, UpdateTarget, deposit),() => { fsm.SetFlag((int)Flags.OnGoBackToWork); });
+        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, GetPos, GetPath, UpdateTarget, onGetMine, UpdateMine, RePath), () => { fsm.SetFlag((int)Flags.OnAbruptReturn); });
+        fsm.AddBehaviour((int)States.GoToDeposit, new GoToDeposit(fsm.SetFlag, GetPos, GetPath, UpdateTarget, deposit, RePath));
+        fsm.AddBehaviour((int)States.Resting, new AbruptReturn(fsm.SetFlag, onGetDeltaTime, GetPos, GetPath, UpdateTarget, deposit), () => { fsm.SetFlag((int)Flags.OnGoBackToWork); });
 
         fsm.ForceCurrentState((int)States.GoToMine);
         //--------------------------------------------------------------------------------
@@ -51,6 +52,8 @@ public class Miner : MonoBehaviour
 
         this.onEmptyMine = onEmptyMine;
         this.onGetMap = onGetMap;
+
+        onUpdateWeight = OnUpdateWeight;
     }
 
     public void UpdateMiner()
@@ -85,6 +88,7 @@ public class Miner : MonoBehaviour
     private List<Vector2Int> GetPath(Vector2Int origin, Vector2Int destination)
     {
         Node[] map = onGetMap.Invoke();
+        updatePath = false;
         return pathfinding.GetPath(map, map[NodeUtils.PositionToIndex(origin)], map[NodeUtils.PositionToIndex(destination)]);
     }
 
@@ -96,6 +100,16 @@ public class Miner : MonoBehaviour
     private void OnEmptyMine()
     {
         onEmptyMine?.Invoke(currentMine);
+    }
+
+    private void OnUpdateWeight()
+    {
+        updatePath = true;
+    }
+
+    private bool RePath()
+    {
+        return updatePath;
     }
     #endregion
 }

@@ -11,6 +11,7 @@ public class GoToMine : FSMAction
     private Action<Vector2Int> onUpdateMine;
     private readonly Func<Vector2> onGetPos;
     private Func<Vector2Int> onGetMine;
+    private Func<bool> rePath;
 
     private Vector3 currentDestination;
     private List<Vector2Int> path;
@@ -20,7 +21,8 @@ public class GoToMine : FSMAction
     #endregion
 
     #region CONSTRUCTOR
-    public GoToMine(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Func<Vector2Int> onGetMine, Action<Vector2Int> onUpdateMine)
+    public GoToMine(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Func<Vector2Int> onGetMine, Action<Vector2Int> onUpdateMine,
+        Func<bool> rePath)
     {
         this.onSetFlag = onSetFlag;
         this.onGetPos = onGetPos;
@@ -28,6 +30,7 @@ public class GoToMine : FSMAction
         this.onUpdateTarget = onUpdateTarget;
         this.onGetMine = onGetMine;
         this.onUpdateMine = onUpdateMine;
+        this.rePath = rePath;
     }
     #endregion
 
@@ -51,17 +54,30 @@ public class GoToMine : FSMAction
         }
         else if (Vector2.Distance(currentDestination, miner) < 0.1f)
         {
-            posIndex++;
-
-            if (posIndex >= path.Count - 1)
+            if (rePath.Invoke())
             {
-                path = null;
-                onSetFlag?.Invoke((int)Flags.OnReachMine);
-                return;
-            }
+                path = onGetPath.Invoke(new Vector2Int((int)miner.x, (int)miner.y), mine);
 
-            currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
-            onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+                posIndex = 0;
+
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+
+                onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+            }
+            else
+            {
+                posIndex++;
+
+                if (posIndex >= path.Count - 1)
+                {
+                    path = null;
+                    onSetFlag?.Invoke((int)Flags.OnReachMine);
+                    return;
+                }
+
+                currentDestination = new Vector3(path[posIndex].x, path[posIndex].y, 0);
+                onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
+            }
         }
     }
 

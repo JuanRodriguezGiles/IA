@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -29,6 +30,7 @@ public class Miners : MonoBehaviour
     #region PRIVATE_FIELDS
     private ConcurrentBag<Miner> miners = new();
     private ParallelOptions parallelOptions;
+    private Action onUpdateWeight;
     private Vector2Int depositPos;
     private float deltaTime;
     [SerializeField] private Node[] map;
@@ -77,7 +79,7 @@ public class Miners : MonoBehaviour
     {
         var go = Instantiate(minerGo, minerSpawnPos, Quaternion.identity, transform);
         var miner = go.GetComponent<Miner>();
-        miner.Init(depositPos, miner.transform.position, GetDeltaTime, GetMine, OnEmptyMine, GetMap);
+        miner.Init(depositPos, miner.transform.position, GetDeltaTime, GetMine, OnEmptyMine, GetMap, ref onUpdateWeight);
 
         miners.Add(miner);
     }
