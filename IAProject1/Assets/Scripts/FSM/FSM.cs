@@ -95,8 +95,19 @@ public class FSM
     {
         if (behaviours.ContainsKey(currentState))
         {
-            Action onExit = behaviours[currentState].onAbruptExit;
+            List<FSMAction> actions = behaviours[currentState].behaviours;
+            if (actions != null)
+            {
+                for (int i = 0; i < actions.Count; i++)
+                {
+                    if (actions[i] != null)
+                    {
+                        actions[i].AbruptExit();
+                    }
+                }
+            }            
             
+            Action onExit = behaviours[currentState].onAbruptExit;
             onExit?.Invoke();
         }
     }

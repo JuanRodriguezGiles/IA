@@ -3,24 +3,27 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public class GoToDeposit : FSMAction
+public class GoBackToWork : FSMAction
 {
     #region PRIVATE_FIELDS
     private readonly Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath;
     private Action<Vector2Int> onUpdateTarget;
     private readonly Func<Vector2> onGetPos;
+    private Func<float> onGetDeltaTime;
 
     private Vector3 currentDestination;
     private readonly Vector2Int deposit;
     private List<Vector2Int> path;
     private Vector2 miner;
     private int posIndex;
+    private bool reached = false;
     #endregion
 
     #region CONSTRUCTOR
-    public GoToDeposit(Action<int> onSetFlag, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int deposit)
+    public GoBackToWork(Action<int> onSetFlag, Func<float> onGetDeltaTime, Func<Vector2> onGetPos, Func<Vector2Int, Vector2Int, List<Vector2Int>> onGetPath, Action<Vector2Int> onUpdateTarget, Vector2Int deposit)
     {
         this.onSetFlag = onSetFlag;
+        this.onGetDeltaTime = onGetDeltaTime;
         this.onGetPos = onGetPos;
         this.onGetPath = onGetPath;
         this.onUpdateTarget = onUpdateTarget;
@@ -31,6 +34,8 @@ public class GoToDeposit : FSMAction
     #region OVERRIDE
     public override void Execute()
     {
+        if (reached) return;
+        
         miner = onGetPos.Invoke();
 
         if (path == null)
@@ -50,7 +55,7 @@ public class GoToDeposit : FSMAction
             if (posIndex >= path.Count - 1)
             {
                 path = null;
-                onSetFlag?.Invoke((int)Flags.OnReachDeposit);
+                reached = true;
                 return;
             }
 
@@ -61,7 +66,7 @@ public class GoToDeposit : FSMAction
 
     public override void AbruptExit()
     {
-        
+        throw new NotImplementedException();
     }
     #endregion
 }

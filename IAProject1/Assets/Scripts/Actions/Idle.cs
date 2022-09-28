@@ -16,5 +16,10 @@ public class Idle : FSMAction
     {
         Debug.Log("Idle");
     }
+
+    public override void AbruptExit()
+    {
+        
+    }
     #endregion
 }

@@ -4,8 +4,8 @@ public enum Flags
     OnReachMine,
     OnReachDeposit,
     OnEmptyMine,
-    OnRest,
-    OnFinishedResting,
+    OnAbruptReturn,
+    OnGoBackToWork,
     
     _Count
 }

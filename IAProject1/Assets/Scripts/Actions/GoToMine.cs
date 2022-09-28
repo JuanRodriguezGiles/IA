@@ -64,5 +64,10 @@ public class GoToMine : FSMAction
             onUpdateTarget?.Invoke(new Vector2Int((int)currentDestination.x, (int)currentDestination.y));
         }
     }
+
+    public override void AbruptExit()
+    {
+        path = null;
+    }
     #endregion
 }

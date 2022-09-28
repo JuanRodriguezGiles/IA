@@ -42,5 +42,10 @@ public class Mine : FSMAction
             onSetFlag?.Invoke((int)Flags.OnFullInventory);
         }
     }
+
+    public override void AbruptExit()
+    {
+        currentMiningTime = 0;
+    }
     #endregion
 }

@@ -20,7 +20,7 @@ public class Miner : MonoBehaviour
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init(Vector2Int deposit, Vector2Int rest, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine, Func<Node[]> onGetMap)
+    public void Init(Vector2Int deposit, Vector2 currentPos, Func<float> onGetDeltaTime, Func<Vector2Int> onGetMine, Action<Vector2Int> onEmptyMine, Func<Node[]> onGetMap)
     {
         pathfinding = new Pathfinding();
         this.currentPos = currentPos;
@@ -31,18 +31,18 @@ public class Miner : MonoBehaviour
         fsm.SetRelation((int)States.GoToMine, (int)Flags.OnReachMine, (int)States.Mining);
         fsm.SetRelation((int)States.Mining, (int)Flags.OnFullInventory, (int)States.GoToDeposit);
         fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnReachDeposit, (int)States.GoToMine);
-        fsm.SetRelation((int)States.GoToDeposit, (int)Flags.OnEmptyMine, (int)States.Idle);
 
         //Early exit states
-        fsm.SetRelation((int)States.Mining, (int)Flags.OnRest, (int)States.Resting);
-        fsm.SetRelation((int)States.Resting, (int)Flags.OnFinishedResting, (int)States.GoToMine);
+        fsm.SetRelation((int)States.Mining, (int)Flags.OnAbruptReturn, (int)States.Resting);
+        fsm.SetRelation((int)States.GoToMine, (int)Flags.OnAbruptReturn, (int)States.Resting);
+        fsm.SetRelation((int)States.Resting, (int)Flags.OnGoBackToWork, (int)States.GoToMine);
 
         //Behaviours
         fsm.AddBehaviour((int)States.Idle, new Idle(fsm.SetFlag));
-        fsm.AddBehaviour((int)States.Mining, new Mine(fsm.SetFlag, onGetDeltaTime, OnEmptyMine), () => { fsm.SetFlag((int)Flags.OnRest); });
-        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, GetPos, GetPath, UpdateTarget, onGetMine, UpdateMine));
+        fsm.AddBehaviour((int)States.Mining, new Mine(fsm.SetFlag, onGetDeltaTime, OnEmptyMine), () => { fsm.SetFlag((int)Flags.OnAbruptReturn); });
+        fsm.AddBehaviour((int)States.GoToMine, new GoToMine(fsm.SetFlag, GetPos, GetPath, UpdateTarget, onGetMine, UpdateMine), () => { fsm.SetFlag((int)Flags.OnAbruptReturn); });
         fsm.AddBehaviour((int)States.GoToDeposit, new GoToDeposit(fsm.SetFlag, GetPos, GetPath, UpdateTarget, deposit));
-        fsm.AddBehaviour((int)States.Resting, new Rest(fsm.SetFlag, onGetDeltaTime, GetPos, GetPath, UpdateTarget, rest));
+        fsm.AddBehaviour((int)States.Resting, new AbruptReturn(fsm.SetFlag, onGetDeltaTime, GetPos, GetPath, UpdateTarget, deposit),() => { fsm.SetFlag((int)Flags.OnGoBackToWork); });
 
         fsm.ForceCurrentState((int)States.GoToMine);
         //--------------------------------------------------------------------------------
