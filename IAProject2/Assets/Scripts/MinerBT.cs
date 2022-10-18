@@ -1,36 +1,24 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 public class MinerBT : Tree
 {
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     protected override Node Setup()
     {
         Node root = new Root(new List<Node>
         {
             new Sequence(new List<Node>
             {
-                new Not(new List<Node>{
-                //MyLeaveNode
+                new Not(new List<Node>
+                {
+                    new Leave()
                 }),
-                new Sequence(new List<Node>{
-                    new Not(new List<Node>(
-                        //MyLeaveNode2
-                        ))
-                    //MyLeaveNode3
+                new Sequence(new List<Node>
+                {
+                    new Not(new List<Node>
+                    {
+                        new Leave()
+                    }),
+                    new Leave()
                 })
             })
         });
