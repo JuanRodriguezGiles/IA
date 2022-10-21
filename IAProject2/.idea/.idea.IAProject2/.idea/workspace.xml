@@ -2,12 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4f831354-79f3-4a70-81ad-ffe2e356adb9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../IAProject1/Assets/Scripts/BehaviourTree/Sequence.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../IAProject1/Assets/Scripts/BehaviourTree/Sequence.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.IAProject2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.IAProject2/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Tree.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Tree.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MinerBT.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MinerBT.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Not.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Not.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Leave.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Leave.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MinerBT.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MinerBT.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Node.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Node.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Not.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Not.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Root.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Root.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Sequence.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Sequence.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Tree.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Tree.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/RiderScriptEditorPersistedState.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/RiderScriptEditorPersistedState.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,6 +85,7 @@
       <updated>1665095992518</updated>
       <workItem from="1665096000208" duration="2812000" />
       <workItem from="1665697110026" duration="854000" />
+      <workItem from="1666054485109" duration="595000" />
     </task>
     <servers />
   </component>
