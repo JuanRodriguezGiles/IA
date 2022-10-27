@@ -13,6 +13,8 @@ public class SimulationScreen : MonoBehaviour
     public Slider timerSlider;
     public Button pauseBtn;
     public Button stopBtn;
+    public Button saveBtn;
+    public Button deleteBtn;
     public GameObject startConfigurationScreen;
 
     string generationsCountText;
@@ -41,6 +43,8 @@ public class SimulationScreen : MonoBehaviour
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
+        saveBtn.onClick.AddListener(PopulationManager.Instance.SaveBrain);
+        deleteBtn.onClick.AddListener(PopulationManager.Instance.DeleteBrains);
     }
 
     void OnEnable()

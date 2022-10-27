@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,8 @@ public class StartConfigurationScreen : MonoBehaviour
     public Slider inputsSlider;
     public Text outputsTxt;
     public Slider outputsSlider;
+    public Text outputsThresholdTxt;
+    public Slider outputsThresholdSlider;
     public Button startButton;
     public GameObject simulationScreen;
 
@@ -40,6 +43,7 @@ public class StartConfigurationScreen : MonoBehaviour
     string neuronsPerHLCountText;
     string inputsText;
     string outputsText;
+    string outputsThresholdText;
 
     void Start()
     {
@@ -53,6 +57,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.onValueChanged.AddListener(OnSigmoidSlopeChange);
         inputsSlider.onValueChanged.AddListener(OnInputsChange);
         outputsSlider.onValueChanged.AddListener(OnOutputsChange);
+        outputsThresholdSlider.onValueChanged.AddListener(OnOutputsThresholdChange);
 
         populationText = populationCountTxt.text;
         elitesText = eliteCountTxt.text;
@@ -64,6 +69,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeText = sigmoidSlopeTxt.text;
         inputsText = inputsTxt.text;
         outputsText = outputsTxt.text;
+        outputsThresholdText = outputsThresholdTxt.text;
 
         populationCountSlider.value = PopulationManager.Instance.PopulationCount;
         eliteCountSlider.value = PopulationManager.Instance.EliteCount;
@@ -75,6 +81,7 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeSlider.value = PopulationManager.Instance.Sigmoid;
         inputsSlider.value = PopulationManager.Instance.InputsCount;
         outputsSlider.value = PopulationManager.Instance.OutputsCount;
+        outputsThresholdSlider.value = PopulationManager.Instance.OutputThreshold;
 
         startButton.onClick.AddListener(OnStartButtonClick);
 
@@ -160,6 +167,13 @@ public class StartConfigurationScreen : MonoBehaviour
         outputsTxt.text = string.Format(outputsText, PopulationManager.Instance.OutputsCount);
     }
 
+    void OnOutputsThresholdChange(float value)
+    {
+        PopulationManager.Instance.OutputThreshold = value;
+
+        outputsThresholdTxt.text = string.Format(outputsThresholdText, PopulationManager.Instance.OutputThreshold.ToString("0.00"));
+    }
+
     void Refresh()
     {
         populationCountTxt.text = string.Format(populationText, PopulationManager.Instance.PopulationCount);
@@ -172,5 +186,6 @@ public class StartConfigurationScreen : MonoBehaviour
         sigmoidSlopeTxt.text = string.Format(sigmoidSlopeText, PopulationManager.Instance.Sigmoid.ToString("0.00"));
         inputsTxt.text = string.Format(inputsText, PopulationManager.Instance.InputsCount);
         outputsTxt.text = string.Format(outputsText, PopulationManager.Instance.OutputsCount);
+        outputsThresholdTxt.text = string.Format(outputsThresholdText, PopulationManager.Instance.OutputThreshold.ToString("0.00"));
     }
 }

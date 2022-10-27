@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class BirdBase : MonoBehaviour
@@ -10,12 +11,9 @@ public class BirdBase : MonoBehaviour
         Dead
     }
 
-    public State state
-    {
-        get; private set;
-    }
+    public State state { get; private set; }
 
-    protected Genome genome;
+    public Genome genome;
     protected NeuralNetwork brain;
     protected BirdBehaviour birdBehaviour;
 
@@ -39,7 +37,7 @@ public class BirdBase : MonoBehaviour
             birdBehaviour.Flap();
     }
 
-    public void Think(float dt)
+    public void Think(float dt, float outputThreshold,List<BrainData> brains)
     {
         if (state == State.Alive)
         {
@@ -48,7 +46,7 @@ public class BirdBase : MonoBehaviour
             if (obstacle == null)
                 return;
 
-            OnThink(dt, birdBehaviour, obstacle);
+            OnThink(dt, outputThreshold, birdBehaviour, obstacle, brains);
 
             birdBehaviour.UpdateBird(dt);
 
@@ -62,17 +60,13 @@ public class BirdBase : MonoBehaviour
 
     protected virtual void OnDead()
     {
-
     }
 
-    protected virtual void OnThink(float dt, BirdBehaviour birdBehaviour, Obstacle obstacle)
+    protected virtual void OnThink(float dt, float outputThreshold, BirdBehaviour birdBehaviour, Obstacle obstacle, List<BrainData> brains)
     {
-
     }
 
     protected virtual void OnReset()
     {
-
     }
-
 }

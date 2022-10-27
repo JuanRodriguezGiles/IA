@@ -6,7 +6,8 @@ public class ObstacleManager : MonoBehaviour
     const float DISTANCE_BETWEEN_OBSTACLES = 6f;
     const float HEIGHT_RANDOM = 3f;
     const int MIN_COUNT = 3;
-    public GameObject prefab;
+    public List<GameObject> prefab;
+    public OBSTACLE_TYPE type;
     Vector3 pos = new Vector3(DISTANCE_BETWEEN_OBSTACLES, 0, 0);
 
     List<Obstacle> obstacles = new List<Obstacle>();
@@ -76,13 +77,29 @@ public class ObstacleManager : MonoBehaviour
 
     void InstantiateObstacle()
     {
-        pos.x += DISTANCE_BETWEEN_OBSTACLES;
-        pos.y = Random.Range(-HEIGHT_RANDOM, HEIGHT_RANDOM);
-        GameObject go = GameObject.Instantiate(prefab, pos, Quaternion.identity);
-        go.transform.SetParent(this.transform, false);
-        Obstacle obstacle = go.GetComponent<Obstacle>();
-        obstacle.OnDestroy += OnObstacleDestroy;
-        obstacles.Add(obstacle);
+        int index = Random.Range(0, 2);
+        if (type == OBSTACLE_TYPE.VERTICAL || (type == OBSTACLE_TYPE.ANY && index == 1)) 
+        {
+            pos.x += DISTANCE_BETWEEN_OBSTACLES;
+            pos.y = Random.Range(-HEIGHT_RANDOM, HEIGHT_RANDOM);
+            GameObject go = GameObject.Instantiate(prefab[0], pos, Quaternion.identity);
+            go.transform.SetParent(this.transform, false);
+            Obstacle obstacle = go.GetComponent<Obstacle>();
+            obstacle.type = OBSTACLE_TYPE.VERTICAL;
+            obstacle.OnDestroy += OnObstacleDestroy;
+            obstacles.Add(obstacle);
+        }
+        else if (type == OBSTACLE_TYPE.HORIZONTAL || (type == OBSTACLE_TYPE.ANY && index == 2)) 
+        {
+            pos.x += DISTANCE_BETWEEN_OBSTACLES;
+            pos.y = 0;
+            GameObject go = GameObject.Instantiate(prefab[1], pos, Quaternion.identity);
+            go.transform.SetParent(this.transform, false);
+            Obstacle obstacle = go.GetComponent<Obstacle>();
+            obstacle.type = OBSTACLE_TYPE.HORIZONTAL;
+            obstacle.OnDestroy += OnObstacleDestroy;
+            obstacles.Add(obstacle);
+        }
     }
 
     void OnObstacleDestroy(Obstacle obstacle)

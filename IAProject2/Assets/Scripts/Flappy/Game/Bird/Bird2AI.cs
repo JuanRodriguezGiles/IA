@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
-public class BirdAI : BirdBase
+public class Bird2AI : BirdBase
 {
     protected override void OnThink(float dt, float outputThreshold, BirdBehaviour birdBehaviour, Obstacle obstacle, List<BrainData> brains)
     {
@@ -14,9 +14,18 @@ public class BirdAI : BirdBase
         inputs[3] = (obstacle.transform.position - birdBehaviour.transform.position).y;
         inputs[4] = (obstacle.transform.position - birdBehaviour.transform.position).y;
 
-        float[] outputs = brain.Synapsis(inputs);
-
-        if (outputs[0] > outputThreshold && outputs[1] > outputThreshold)
+        float[] outputs;
+        
+        if (obstacle.type == OBSTACLE_TYPE.VERTICAL)
+        {
+            outputs = brains[0].brain.Synapsis(inputs);
+        }
+        else
+        {
+            outputs = brains[1].brain.Synapsis(inputs);
+        }
+        
+        if (outputs[0] > outputThreshold)
         {
             birdBehaviour.Flap();
         }
@@ -25,7 +34,7 @@ public class BirdAI : BirdBase
         {
             genome.fitness *= 2;
         }
-
+        
         genome.fitness += (100.0f - Vector3.Distance(obstacle.transform.position, birdBehaviour.transform.position));
         genome.fitness -= Math.Abs(birdBehaviour.transform.position.y) * 2;
     }

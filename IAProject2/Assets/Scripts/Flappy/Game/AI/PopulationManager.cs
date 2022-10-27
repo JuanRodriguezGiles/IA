@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,33 +20,28 @@ public class PopulationManager : MonoBehaviour
     public float Bias = 1f;
     public float Sigmoid = 0.5f;
 
+    public float OutputThreshold = 0.5f;
+
+    public List<string> brainsDataName;
+    public string currentDataName;
+    public OBSTACLE_TYPE currentObstacleType;
+    
     GeneticAlgorithm genAlg;
 
     List<BirdBase> populationGOs = new List<BirdBase>();
     List<Genome> population = new List<Genome>();
     List<NeuralNetwork> brains = new List<NeuralNetwork>();
+    List<BrainData> savedBrains = new List<BrainData>();
 
     bool isRunning = false;
 
-    public int generation
-    {
-        get; private set;
-    }
+    public int generation { get; private set; }
 
-    public float bestFitness
-    {
-        get; private set;
-    }
+    public float bestFitness { get; private set; }
 
-    public float avgFitness
-    {
-        get; private set;
-    }
+    public float avgFitness { get; private set; }
 
-    public float worstFitness
-    {
-        get; private set;
-    }
+    public float worstFitness { get; private set; }
 
     private float GetBestFitness()
     {
@@ -58,7 +54,7 @@ public class PopulationManager : MonoBehaviour
 
         return fitness;
     }
-
+    
     private float GetAvgFitness()
     {
         float fitness = 0;
@@ -151,9 +147,56 @@ public class PopulationManager : MonoBehaviour
         PlayerPrefs.SetFloat("P", Sigmoid);
     }
 
+    public void SaveBrain()
+    {
+        DataModel dataModel = new DataModel();
+
+        dataModel.population = GetBestAgent().genome;
+        dataModel.Bias = Bias;
+        dataModel.outputThreshold = OutputThreshold;
+        dataModel.Sigmoid = Sigmoid;
+        dataModel.HiddenLayers = HiddenLayers;
+        dataModel.InputsCount = InputsCount;
+        dataModel.OutputsCount = OutputsCount;
+        dataModel.NeuronsCountPerHL = NeuronsCountPerHL;
+        dataModel.type = currentObstacleType;
+        
+        PlayerPrefs.SetString("Brain_" + currentDataName, JsonUtility.ToJson(dataModel));
+    }
+
+    public void DeleteBrains()
+    {
+        for (int i = 0; i < brainsDataName.Count; i++)
+        {
+            PlayerPrefs.DeleteKey("Brain_" + brainsDataName[i]);
+        }
+    }
+
+    public void LoadBrains()
+    {
+        for (int i = 0; i < brainsDataName.Count; i++)
+        {
+            if (PlayerPrefs.HasKey("Brain_" + brainsDataName[i]))
+            {
+                string json = PlayerPrefs.GetString("Brain_" + brainsDataName[i]);
+
+                DataModel dataModel = JsonUtility.FromJson<DataModel>(json);
+                
+                NeuralNetwork brain = CreateBrain(dataModel.InputsCount, dataModel.Bias, dataModel.Sigmoid, dataModel.HiddenLayers, dataModel.NeuronsCountPerHL, dataModel.OutputsCount);
+                BrainData brainData = new BrainData();
+                brainData.brain = brain;
+                brainData.genome = dataModel.population;
+                brainData.OutputThreshold = dataModel.outputThreshold;
+                
+                savedBrains.Add(brainData);
+            }
+        }
+    }
+
     public void StartSimulation()
     {
         Save();
+        LoadBrains();
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
 
@@ -187,16 +230,16 @@ public class PopulationManager : MonoBehaviour
     {
         generation = 0;
         DestroyBirds();
-
+        
         for (int i = 0; i < PopulationCount; i++)
         {
             NeuralNetwork brain = CreateBrain();
-
+        
             Genome genome = new Genome(brain.GetTotalWeightsCount());
-
+        
             brain.SetWeights(genome.genome);
             brains.Add(brain);
-
+        
             population.Add(genome);
             populationGOs.Add(CreateBird(genome, brain));
         }
@@ -218,6 +261,25 @@ public class PopulationManager : MonoBehaviour
 
         // Add the output layer with as many neurons as outputs
         brain.AddNeuronLayer(OutputsCount, Bias, Sigmoid);
+
+        return brain;
+    }
+
+    NeuralNetwork CreateBrain(int inputsCount, float bias, float sigmoid, float hiddenLayers, int neuronsCountPerHl, int outputsCount)
+    {
+        NeuralNetwork brain = new NeuralNetwork();
+
+        // Add first neuron layer that has as many neurons as inputs
+        brain.AddFirstNeuronLayer(inputsCount, bias, sigmoid);
+
+        for (int i = 0; i < hiddenLayers; i++)
+        {
+            // Add each hidden layer with custom neurons count
+            brain.AddNeuronLayer(neuronsCountPerHl, bias, sigmoid);
+        }
+
+        // Add the output layer with as many neurons as outputs
+        brain.AddNeuronLayer(outputsCount, bias, sigmoid);
 
         return brain;
     }
@@ -252,7 +314,6 @@ public class PopulationManager : MonoBehaviour
             brain.SetWeights(newGenomes[i].genome);
             populationGOs[i].SetBrain(newGenomes[i], brain);
         }
-
     }
 
     // Update is called once per frame
@@ -273,7 +334,7 @@ public class PopulationManager : MonoBehaviour
             foreach (BirdBase b in populationGOs)
             {
                 // Think!! 
-                b.Think(dt);
+                b.Think(dt, OutputThreshold, savedBrains);
                 if (b.state == BirdBase.State.Alive)
                     areAllDead = false;
             }
@@ -306,7 +367,5 @@ public class PopulationManager : MonoBehaviour
         population.Clear();
         brains.Clear();
     }
-
     #endregion
-
 }
