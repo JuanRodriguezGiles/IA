@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Tank : TankBase
 {
@@ -13,16 +14,6 @@ public class Tank : TankBase
         Vector3 dirToMine = GetDirToMine(nearMine);
         Vector3 dir = this.transform.forward;
 
-        inputs[4] = -1;
-        inputs[5] = -1;
-        
-        var colliders = Physics.OverlapSphere(nearMine.transform.position, 10);
-        if (colliders != null)
-        {
-            inputs[4] = colliders.Length;
-            inputs[5] = colliders.Length;
-        }
-        
         inputs[0] = dirToMine.x;
         inputs[1] = dirToMine.z;
         inputs[2] = dir.x;
@@ -30,8 +21,8 @@ public class Tank : TankBase
 
         float[] output = brain.Synapsis(inputs);
 
-        SetForces(output[0], output[1], output[4], dt);
-    }
+        SetForces(output[0], output[1], dt);
+	}
     
     protected override void OnTakeMine(GameObject mine)
     {

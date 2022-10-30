@@ -51,7 +51,7 @@ public class TankBase : MonoBehaviour
         return (this.transform.position - nearMine.transform.position).sqrMagnitude <= 2.0f;
     }
 
-    protected void SetForces(float leftForce, float rightForce, float reverse, float dt)
+    protected void SetForces(float leftForce, float rightForce, float dt)
     {
         Vector3 pos = this.transform.position;
         float rotFactor = Mathf.Clamp((rightForce - leftForce), -1.0f, 1.0f);
