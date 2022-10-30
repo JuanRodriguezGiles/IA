@@ -3,8 +3,10 @@ using System.Collections;
 
 public class Tank : TankBase
 {
-    float fitness = 0;
-    protected override void OnReset()
+    public bool good = false;
+    public float fitness = 0;
+    
+    public override void OnReset()
     {
         fitness = 1;
     }
@@ -18,6 +20,8 @@ public class Tank : TankBase
         inputs[1] = dirToMine.z;
         inputs[2] = dir.x;
         inputs[3] = dir.z;
+        inputs[4] = IsGoodMine(nearMine) ? 1 : 0;
+        inputs[5] = IsGoodMine(nearMine) ? 1 : 0;
 
         float[] output = brain.Synapsis(inputs);
 
@@ -26,7 +30,19 @@ public class Tank : TankBase
     
     protected override void OnTakeMine(GameObject mine)
     {
-        fitness *= 2;
-        genome.fitness = fitness;
+        if (IsGoodMine(mine) && !good) 
+        {
+            fitness *= 2;
+            genome.fitness = fitness;
+        }
+        else if (!IsGoodMine(mine) && good)
+        {
+            fitness *= 2;
+            genome.fitness = fitness;
+        }
+        else
+        {
+            Debug.Log("No points given");
+        }
     }
 }

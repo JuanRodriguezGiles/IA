@@ -80,8 +80,8 @@ public class TankBase : MonoBehaviour
     {
     }
 
-    protected virtual void OnReset()
+    public virtual void OnReset()
     {
-
+        Debug.Log("RIP");
     }
 }
