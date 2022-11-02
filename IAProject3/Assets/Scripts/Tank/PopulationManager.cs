@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 
-using System.Collections;
 using System.Collections.Generic;
+
+using UnityEditor;
+
+using File = System.IO.File;
 
 public class PopulationManager : MonoBehaviour
 {
@@ -29,6 +32,14 @@ public class PopulationManager : MonoBehaviour
     public float Bias = 1f;
     public float P = 0.5f;
 
+    [Header("Saved data config")]
+    public bool useSavedData;
+    public bool usedSavedConfig;
+
+    public TextAsset configJson;
+    public TextAsset greenBrainJson;
+    public TextAsset redBrainJson;
+
 
     GeneticAlgorithm genAlg;
     List<Tank> populationGOs = new List<Tank>();
@@ -37,7 +48,7 @@ public class PopulationManager : MonoBehaviour
     List<GameObject> mines = new List<GameObject>();
     List<GameObject> goodMines = new List<GameObject>();
     List<GameObject> badMines = new List<GameObject>();
-    
+
     GeneticAlgorithm genAlgGood;
     GeneticAlgorithm genAlgBad;
     List<Tank> populationGOsGood = new List<Tank>();
@@ -90,18 +101,20 @@ public class PopulationManager : MonoBehaviour
 
         if (goodWon)
         {
-            foreach (Genome g in populationGood) 
+            foreach (Genome g in populationGood)
             {
                 fitness += g.fitness;
             }
+
             return fitness / populationGood.Count;
         }
         else
         {
-            foreach (Genome g in populationBad) 
+            foreach (Genome g in populationBad)
             {
                 fitness += g.fitness;
             }
+
             return fitness / populationBad.Count;
         }
     }
@@ -110,12 +123,13 @@ public class PopulationManager : MonoBehaviour
     {
         float fitnessGood = float.MaxValue;
         float fitnessBad = float.MaxValue;
-        
+
         foreach (Genome g in populationGood)
         {
             if (fitnessGood > g.fitness)
                 fitnessGood = g.fitness;
         }
+
         foreach (Genome g in populationBad)
         {
             if (fitnessBad > g.fitness)
@@ -149,11 +163,17 @@ public class PopulationManager : MonoBehaviour
 
     public void StartSimulation()
     {
+        if (usedSavedConfig)
+        {
+            LoadConfig();
+        }
+        SaveConfig();
+
         // Create and confiugre the Genetic Algorithm
         genAlg = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
         genAlgGood = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
         genAlgBad = new GeneticAlgorithm(EliteCount, MutationChance, MutationRate);
-        
+
         GenerateInitialPopulation();
         CreateMines();
 
@@ -186,30 +206,49 @@ public class PopulationManager : MonoBehaviour
         // Destroy previous tanks (if there are any)
         DestroyTanks();
 
-        for (int i = 0; i < PopulationCount; i++)
+        if (useSavedData)
         {
-            NeuralNetwork brain = CreateBrain();
+            BrainData brainGreen = JsonUtility.FromJson<BrainData>(greenBrainJson.text);
+            BrainData brainRed = JsonUtility.FromJson<BrainData>(redBrainJson.text);
 
-            Genome genome = new Genome(brain.GetTotalWeightsCount());
-
-            if (i % 2 == 0)
+            for (int i = 0; i < PopulationCount / 2; i++)
             {
-                brain.SetWeights(genome.genome);
-                brainsGood.Add(brain);
+                brainsGood.Add(brainGreen.brain[i]);
+                populationGood.Add(brainGreen.genome[i]);
+                populationGOsGood.Add(CreateTank(brainGreen.genome[i], brainGreen.brain[i], true));
 
-                populationGood.Add(genome);
-                populationGOsGood.Add(CreateTank(genome, brain, true));
-            }
-            else
-            {
-                brain.SetWeights(genome.genome);
-                brainsBad.Add(brain);
-
-                populationBad.Add(genome);
-                populationGOsBad.Add(CreateTank(genome, brain, false));
+                brainsBad.Add(brainRed.brain[i]);
+                populationBad.Add(brainRed.genome[i]);
+                populationGOsBad.Add(CreateTank(brainRed.genome[i], brainRed.brain[i], false));
             }
         }
-        
+        else
+        {
+            for (int i = 0; i < PopulationCount; i++)
+            {
+                NeuralNetwork brain = CreateBrain();
+
+                Genome genome = new Genome(brain.GetTotalWeightsCount());
+
+                if (i % 2 == 0)
+                {
+                    brain.SetWeights(genome.genome);
+                    brainsGood.Add(brain);
+
+                    populationGood.Add(genome);
+                    populationGOsGood.Add(CreateTank(genome, brain, true));
+                }
+                else
+                {
+                    brain.SetWeights(genome.genome);
+                    brainsBad.Add(brain);
+
+                    populationBad.Add(genome);
+                    populationGOsBad.Add(CreateTank(genome, brain, false));
+                }
+            }
+        }
+
         accumTime = 0.0f;
     }
 
@@ -242,13 +281,13 @@ public class PopulationManager : MonoBehaviour
         {
             fitnessGood += populationGOsGood[i].fitness;
         }
-        
+
         float fitnessBad = 0;
         for (int i = 0; i < populationGOsBad.Count; i++)
         {
             fitnessBad += populationGOsBad[i].fitness;
         }
-        
+
         // Increment generation counter
         generation++;
 
@@ -260,8 +299,9 @@ public class PopulationManager : MonoBehaviour
         // Evolve each genome and create a new array of genomes
         if (fitnessGood > fitnessBad)
         {
+            Debug.Log("GREEN WON");
             Genome[] newGenomes = genAlgBad.Epoch(populationBad.ToArray());
-            
+
             // Clear current population
             populationBad.Clear();
 
@@ -269,7 +309,7 @@ public class PopulationManager : MonoBehaviour
             populationBad.AddRange(newGenomes);
 
             // Set the new genomes as each NeuralNetwork weights
-            for (int i = 0; i < PopulationCount / 2; i++) 
+            for (int i = 0; i < PopulationCount / 2; i++)
             {
                 NeuralNetwork brain = brainsBad[i];
 
@@ -286,8 +326,9 @@ public class PopulationManager : MonoBehaviour
         }
         else
         {
+            Debug.Log("RED WON");
             Genome[] newGenomes = genAlgGood.Epoch(populationGood.ToArray());
-            
+
             // Clear current population
             populationGood.Clear();
 
@@ -295,7 +336,7 @@ public class PopulationManager : MonoBehaviour
             populationGood.AddRange(newGenomes);
 
             // Set the new genomes as each NeuralNetwork weights
-            for (int i = 0; i < PopulationCount / 2; i++) 
+            for (int i = 0; i < PopulationCount / 2; i++)
             {
                 NeuralNetwork brain = brainsGood[i];
 
@@ -358,7 +399,7 @@ public class PopulationManager : MonoBehaviour
             //     // Set tank position
             //     t.transform.position = pos;
             // }
-            
+
             foreach (Tank t in populationGOsGood)
             {
                 // Get the nearest mine
@@ -395,7 +436,7 @@ public class PopulationManager : MonoBehaviour
                 // Set tank position
                 t.transform.position = pos;
             }
-            
+
             foreach (Tank t in populationGOsBad)
             {
                 // Get the nearest mine
@@ -457,6 +498,7 @@ public class PopulationManager : MonoBehaviour
         {
             go = Instantiate<GameObject>(TankPrefabBad, position, GetRandomRot());
         }
+
         Tank t = go.GetComponent<Tank>();
         t.SetBrain(genome, brain);
         t.good = good;
@@ -480,10 +522,10 @@ public class PopulationManager : MonoBehaviour
 
         foreach (Tank go in populationGOsGood)
             Destroy(go.gameObject);
-        
+
         foreach (Tank go in populationGOsBad)
             Destroy(go.gameObject);
-        
+
         populationGOs.Clear();
         populationGOsGood.Clear();
         populationGOsBad.Clear();
@@ -603,6 +645,67 @@ public class PopulationManager : MonoBehaviour
         }
 
         return nearest;
+    }
+
+    public void SaveGreenTeam()
+    {
+        BrainData brainData = new BrainData
+        {
+            genome = populationGood,
+            brain = brainsGood
+        };
+        File.WriteAllText(AssetDatabase.GetAssetPath(greenBrainJson), JsonUtility.ToJson(brainData));
+    }
+
+    public void SaveRedTeam()
+    {
+        BrainData brainData = new BrainData
+        {
+            genome = populationBad,
+            brain = brainsBad
+        };
+        File.WriteAllText(AssetDatabase.GetAssetPath(redBrainJson), JsonUtility.ToJson(brainData));
+    }
+
+    public void SaveConfig()
+    {
+        ConfigData configData = new ConfigData
+        {
+            populationCount = PopulationCount,
+            minesCount = MinesCount,
+            generationDuration = GenerationDuration,
+            iterationCount = IterationCount,
+            eliteCount = EliteCount,
+            mutationChance = MutationChance,
+            mutationRate = MutationRate,
+            inputsCount = InputsCount,
+            hiddenLayers = HiddenLayers,
+            outputsCount = OutputsCount,
+            neuronsCountPerHL = NeuronsCountPerHL,
+            bias = Bias,
+            p = P
+        };
+
+        File.WriteAllText(AssetDatabase.GetAssetPath(configJson), JsonUtility.ToJson(configData));
+    }
+
+    public void LoadConfig()
+    {
+        ConfigData configData = JsonUtility.FromJson<ConfigData>(configJson.text);
+
+        PopulationCount = configData.populationCount;
+        MinesCount = configData.minesCount;
+        GenerationDuration = configData.generationDuration;
+        IterationCount = configData.iterationCount;
+        EliteCount = configData.eliteCount;
+        MutationChance = configData.mutationChance;
+        MutationRate = configData.mutationRate;
+        InputsCount = configData.inputsCount;
+        HiddenLayers = configData.hiddenLayers;
+        OutputsCount = configData.outputsCount;
+        NeuronsCountPerHL = configData.neuronsCountPerHL;
+        Bias = configData.bias;
+        P = configData.p;
     }
     #endregion
 }

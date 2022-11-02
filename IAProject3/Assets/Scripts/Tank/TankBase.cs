@@ -8,7 +8,7 @@ public class TankBase : MonoBehaviour
 
     protected Genome genome;
 	protected NeuralNetwork brain;
-    protected GameObject nearMine;
+    public GameObject nearMine;
     protected GameObject goodMine;
     protected GameObject badMine;
     protected float[] inputs;

@@ -13,6 +13,8 @@ public class SimulationScreen : MonoBehaviour
     public Slider timerSlider;
     public Button pauseBtn;
     public Button stopBtn;
+    public Button saveGreenBtn;
+    public Button saveRedBtn;
     public GameObject startConfigurationScreen;
 
     string generationsCountText;
@@ -41,6 +43,8 @@ public class SimulationScreen : MonoBehaviour
 
         pauseBtn.onClick.AddListener(OnPauseButtonClick);
         stopBtn.onClick.AddListener(OnStopButtonClick);
+        saveGreenBtn.onClick.AddListener(PopulationManager.Instance.SaveGreenTeam);
+        saveRedBtn.onClick.AddListener(PopulationManager.Instance.SaveRedTeam);
     }
 
     void OnEnable()
