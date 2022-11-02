@@ -155,18 +155,19 @@ public class PopulationManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-    }
-
-    void Start()
-    {
-    }
-
-    public void StartSimulation()
-    {
         if (usedSavedConfig)
         {
             LoadConfig();
         }
+    }
+
+    void Start()
+    {
+       
+    }
+
+    public void StartSimulation()
+    {
         SaveConfig();
 
         // Create and confiugre the Genetic Algorithm

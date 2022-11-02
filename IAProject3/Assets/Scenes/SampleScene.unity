@@ -6085,7 +6085,7 @@ MonoBehaviour:
   Bias: -1
   P: 0.5
   useSavedData: 1
-  usedSavedConfig: 0
+  usedSavedConfig: 1
   configJson: {fileID: 4900000, guid: 3c2a75bc1fa52bf44b9060dd96164d0e, type: 3}
   greenBrainJson: {fileID: 4900000, guid: 1ffe3ab8ddb356a409eaa61d6c41c9b1, type: 3}
   redBrainJson: {fileID: 4900000, guid: 1f7267386872df14fa68e52e98f82427, type: 3}
