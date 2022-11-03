@@ -210,8 +210,10 @@ public class PopulationManager : MonoBehaviour
 
         if (useSavedData)
         {
-            string brainGreenJson = File.ReadAllText(Application.persistentDataPath + "/greenBrain.json");
-            string brainRedJson = File.ReadAllText(Application.persistentDataPath + "/redBrain.json");
+            string pathGreen = EditorUtility.OpenFilePanel("Overwrite with green brain", "", "json");
+            string pathRed = EditorUtility.OpenFilePanel("Overwrite with red brain", "", "json");
+            string brainGreenJson = File.ReadAllText(pathGreen);
+            string brainRedJson = File.ReadAllText(pathRed);
 
             BrainData brainGreen = JsonUtility.FromJson<BrainData>(brainGreenJson);
             BrainData brainRed = JsonUtility.FromJson<BrainData>(brainRedJson);
@@ -709,7 +711,9 @@ public class PopulationManager : MonoBehaviour
 
     public void LoadConfig()
     {
-        ConfigData configData = JsonUtility.FromJson<ConfigData>(configJson.text);
+        string path = EditorUtility.OpenFilePanel("Overwrite with config json", "", "json");
+        string json = File.ReadAllText(path);
+        ConfigData configData = JsonUtility.FromJson<ConfigData>(json);
 
         PopulationCount = configData.populationCount;
         MinesCount = configData.minesCount;
