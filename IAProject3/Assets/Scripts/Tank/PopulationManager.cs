@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using UnityEditor;
 
+using UnityEngine.UI;
+
 using File = System.IO.File;
 
 public class PopulationManager : MonoBehaviour
@@ -210,10 +212,8 @@ public class PopulationManager : MonoBehaviour
 
         if (useSavedData)
         {
-            string pathGreen = EditorUtility.OpenFilePanel("Overwrite with green brain", "", "json");
-            string pathRed = EditorUtility.OpenFilePanel("Overwrite with red brain", "", "json");
-            string brainGreenJson = File.ReadAllText(pathGreen);
-            string brainRedJson = File.ReadAllText(pathRed);
+            string brainGreenJson = Resources.Load<TextAsset>("greenBrain").text;
+            string brainRedJson = Resources.Load<TextAsset>("redBrain").text;
 
             BrainData brainGreen = JsonUtility.FromJson<BrainData>(brainGreenJson);
             BrainData brainRed = JsonUtility.FromJson<BrainData>(brainRedJson);
@@ -711,10 +711,9 @@ public class PopulationManager : MonoBehaviour
 
     public void LoadConfig()
     {
-        string path = EditorUtility.OpenFilePanel("Overwrite with config json", "", "json");
-        string json = File.ReadAllText(path);
-        ConfigData configData = JsonUtility.FromJson<ConfigData>(json);
-
+        var json = Resources.Load<TextAsset>("config");
+        ConfigData configData = JsonUtility.FromJson<ConfigData>(json.text);
+        
         PopulationCount = configData.populationCount;
         MinesCount = configData.minesCount;
         GenerationDuration = configData.generationDuration;
