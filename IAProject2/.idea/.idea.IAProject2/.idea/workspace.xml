@@ -3,6 +3,18 @@
   <component name="ChangeListManager">
     <list default="true" id="4f831354-79f3-4a70-81ad-ffe2e356adb9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.IAProject2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.IAProject2/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/RiderScriptEditorPersistedState.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/RiderScriptEditorPersistedState.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Prefab/TankBad.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Prefab/TankBad.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Prefab/TankGood.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Prefab/TankGood.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/GeneticAlg/GeneticAlgorithm.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/GeneticAlg/GeneticAlgorithm.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/NeuralNetwork.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/NeuralNetwork.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/Neuron.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/Neuron.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/NeuronLayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/NeuralNet/NeuronLayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/PopulationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/PopulationManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/Tank.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/Tank.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/TankBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/Tank/TankBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/UI/SimulationScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../IAProject3/Assets/Scripts/UI/SimulationScreen.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,19 +35,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Discover.Launch.Via.Unity": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "XThreadsFramesViewSplitterKey": "0.50045997",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Discover.Launch.Via.Unity&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.50045997&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="UnitTests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2021.3.0f1\Editor\Unity.exe" />
@@ -55,10 +67,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="18408">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="18408" />
+      <option name="pid" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
@@ -80,6 +92,7 @@
       <workItem from="1666649131478" duration="3921000" />
       <workItem from="1666822627463" duration="9131000" />
       <workItem from="1666895022929" duration="3092000" />
+      <workItem from="1667344419987" duration="1130000" />
     </task>
     <servers />
   </component>

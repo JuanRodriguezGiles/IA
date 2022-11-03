@@ -26,6 +26,8 @@ public class StartConfigurationScreen : MonoBehaviour
     public Text sigmoidSlopeTxt;
     public Slider sigmoidSlopeSlider;
     public Button startButton;
+    public Toggle useConfigToggle;
+    public Toggle usedTanksToggle;
     public GameObject simulationScreen;
     
     string populationText;
@@ -74,7 +76,15 @@ public class StartConfigurationScreen : MonoBehaviour
         biasSlider.value = -PopulationManager.Instance.Bias;
         sigmoidSlopeSlider.value = PopulationManager.Instance.P;
 
-        startButton.onClick.AddListener(OnStartButtonClick);        
+        startButton.onClick.AddListener(OnStartButtonClick);
+        useConfigToggle.onValueChanged.AddListener((arg0 =>
+        {
+            PopulationManager.Instance.usedSavedConfig = arg0;
+        }));
+        usedTanksToggle.onValueChanged.AddListener((arg0 =>
+        {
+            PopulationManager.Instance.useSavedData = arg0;
+        }));
     }
 
     void OnPopulationCountChange(float value)

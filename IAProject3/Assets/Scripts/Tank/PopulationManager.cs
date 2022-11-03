@@ -34,6 +34,7 @@ public class PopulationManager : MonoBehaviour
 
     [Header("Saved data config")]
     public bool useSavedData;
+
     public bool usedSavedConfig;
 
     public TextAsset configJson;
@@ -155,19 +156,19 @@ public class PopulationManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        if (usedSavedConfig)
-        {
-            LoadConfig();
-        }
     }
 
     void Start()
     {
-       
     }
 
     public void StartSimulation()
     {
+        if (usedSavedConfig)
+        {
+            LoadConfig();
+        }
+
         SaveConfig();
 
         // Create and confiugre the Genetic Algorithm
@@ -289,18 +290,30 @@ public class PopulationManager : MonoBehaviour
             fitnessBad += populationGOsBad[i].fitness;
         }
 
-        // Increment generation counter
-        generation++;
-
         // Calculate best, average and worst fitness
         bestFitness = getBestFitness(fitnessGood > fitnessBad);
         avgFitness = getAvgFitness(fitnessGood > fitnessBad);
         worstFitness = getWorstFitness(fitnessGood > fitnessBad);
 
+        // Increment generation counter
+        generation++;
+        
+        if (useSavedData)
+        {
+            for (int i = 0; i < PopulationCount / 2; i++)
+            {
+                populationGOsGood[i].OnReset();
+                populationGOsBad[i].OnReset();
+            }
+
+            return;
+        }
+
         // Evolve each genome and create a new array of genomes
         if (fitnessGood > fitnessBad)
         {
             Debug.Log("GREEN WON");
+
             Genome[] newGenomes = genAlgBad.Epoch(populationBad.ToArray());
 
             // Clear current population
@@ -328,6 +341,7 @@ public class PopulationManager : MonoBehaviour
         else
         {
             Debug.Log("RED WON");
+
             Genome[] newGenomes = genAlgGood.Epoch(populationGood.ToArray());
 
             // Clear current population
