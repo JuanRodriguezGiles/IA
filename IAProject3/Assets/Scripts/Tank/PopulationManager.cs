@@ -210,8 +210,11 @@ public class PopulationManager : MonoBehaviour
 
         if (useSavedData)
         {
-            BrainData brainGreen = JsonUtility.FromJson<BrainData>(greenBrainJson.text);
-            BrainData brainRed = JsonUtility.FromJson<BrainData>(redBrainJson.text);
+            string brainGreenJson = File.ReadAllText(Application.persistentDataPath + "/greenBrain.json");
+            string brainRedJson = File.ReadAllText(Application.persistentDataPath + "/redBrain.json");
+
+            BrainData brainGreen = JsonUtility.FromJson<BrainData>(brainGreenJson);
+            BrainData brainRed = JsonUtility.FromJson<BrainData>(brainRedJson);
 
             for (int i = 0; i < PopulationCount / 2; i++)
             {
@@ -669,7 +672,7 @@ public class PopulationManager : MonoBehaviour
             genome = populationGood,
             brain = brainsGood
         };
-        File.WriteAllText(AssetDatabase.GetAssetPath(greenBrainJson), JsonUtility.ToJson(brainData));
+        File.WriteAllText(Application.persistentDataPath + "/greenBrain.json", JsonUtility.ToJson(brainData));
     }
 
     public void SaveRedTeam()
@@ -679,7 +682,7 @@ public class PopulationManager : MonoBehaviour
             genome = populationBad,
             brain = brainsBad
         };
-        File.WriteAllText(AssetDatabase.GetAssetPath(redBrainJson), JsonUtility.ToJson(brainData));
+        File.WriteAllText(Application.persistentDataPath + "/redBrain.json", JsonUtility.ToJson(brainData));
     }
 
     public void SaveConfig()
@@ -701,7 +704,7 @@ public class PopulationManager : MonoBehaviour
             p = P
         };
 
-        File.WriteAllText(AssetDatabase.GetAssetPath(configJson), JsonUtility.ToJson(configData));
+        File.WriteAllText(Application.persistentDataPath + "/config.json", JsonUtility.ToJson(configData));
     }
 
     public void LoadConfig()
